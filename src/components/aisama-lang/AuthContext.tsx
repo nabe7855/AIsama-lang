@@ -8,6 +8,8 @@ interface AuthContextType {
   user: SupabaseUser | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
+  signUp: (email: string, pass: string) => Promise<void>;
+  signIn: (email: string, pass: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -59,6 +61,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const signUp = async (email: string, pass: string) => {
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password: pass,
+      });
+      if (error) throw error;
+      alert(
+        "確認メールを送信しました。メール内のリンクをクリックして登録を完了してください。",
+      );
+    } catch (error: any) {
+      console.error("Error signing up:", error);
+      alert(error.message || "登録に失敗しました。");
+    }
+  };
+
+  const signIn = async (email: string, pass: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password: pass,
+      });
+      if (error) throw error;
+    } catch (error: any) {
+      console.error("Error signing in:", error);
+      alert(error.message || "ログインに失敗しました。");
+    }
+  };
+
   const logout = async () => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -74,6 +105,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         user,
         loading,
         signInWithGoogle,
+        signUp,
+        signIn,
         logout,
       }}
     >
