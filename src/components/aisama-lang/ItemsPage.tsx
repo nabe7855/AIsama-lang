@@ -53,6 +53,7 @@ export const ItemsPage = () => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [flippedIds, setFlippedIds] = useState<Set<string>>(new Set());
 
   const refresh = async () => {
     try {
@@ -314,78 +315,137 @@ export const ItemsPage = () => {
           return (
             <div
               key={item.id}
-              className={cn(
-                "bg-white rounded-[3rem] p-10 border-2 transition-all duration-500 relative group flex flex-col justify-between overflow-hidden",
-                item.active
-                  ? "border-slate-100 shadow-xl shadow-slate-100/50 hover:shadow-2xl hover:shadow-slate-200/50 hover:-translate-y-1"
-                  : "border-transparent bg-slate-50/50 grayscale opacity-40 hover:opacity-100 hover:grayscale-0",
-              )}
+              className="relative h-96 perspective-1000 group"
+              onClick={() => {
+                const next = new Set(flippedIds);
+                if (next.has(item.id)) next.delete(item.id);
+                else next.add(item.id);
+                setFlippedIds(next);
+              }}
             >
-              {/* Type Accent */}
               <div
                 className={cn(
-                  "absolute top-0 right-10 w-16 h-1 blur-md",
-                  typeColor[item.type],
+                  "relative w-full h-full transition-all duration-700 preserve-3d cursor-pointer",
+                  flippedIds.has(item.id) ? "rotate-y-180" : "",
+                  !item.active && "opacity-40 grayscale-[50%]",
                 )}
-              />
-
-              <div>
-                <div className="flex justify-between items-start mb-8">
-                  <div className="flex items-center gap-3">
+              >
+                {/* Front Side */}
+                <div className="absolute inset-0 backface-hidden bg-white border-2 border-slate-50 rounded-[3rem] p-10 shadow-xl shadow-slate-100/50 flex flex-col justify-between overflow-hidden">
+                  <div
+                    className={cn(
+                      "absolute top-0 right-10 w-16 h-1 blur-md",
+                      typeColor[item.type],
+                    )}
+                  />
+                  <div className="flex justify-between items-start">
                     <div
                       className={cn(
-                        "w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg",
+                        "w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg",
                         typeColor[item.type],
                       )}
                     >
-                      <Icon className="w-5 h-5" />
+                      <Icon className="w-6 h-6" />
                     </div>
-                    <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] truncate max-w-[120px]">
-                      {item.video_id}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggle(item.id);
+                        }}
+                        className={cn(
+                          "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-md",
+                          item.active
+                            ? "bg-green-500 text-white scale-110"
+                            : "bg-slate-200 text-slate-400",
+                        )}
+                      >
+                        <Check className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(item.id);
+                        }}
+                        className="w-10 h-10 rounded-full bg-red-50 text-red-400 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-500 hover:text-white"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleToggle(item.id)}
-                      className={cn(
-                        "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-md",
-                        item.active
-                          ? "bg-green-500 text-white scale-110"
-                          : "bg-slate-200 text-slate-400",
-                      )}
-                    >
-                      <Check className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      className="w-10 h-10 rounded-full bg-red-50 text-red-400 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-500 hover:text-white"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                  <div>
+                    <h3 className="text-2xl font-black text-slate-800 leading-tight tracking-tight group-hover:text-blue-600 transition-colors uppercase italic">
+                      {item.head}
+                    </h3>
+                    <div className="flex items-center gap-2 mt-4">
+                      <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] truncate max-w-[150px]">
+                        ID: {item.video_id}
+                      </span>
+                    </div>
+                    <p className="text-[9px] font-black text-slate-300 uppercase tracking-[0.2em] mt-6">
+                      TAP TO LEARN
+                    </p>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <p className="text-2xl font-black text-slate-800 leading-tight tracking-tight group-hover:text-blue-600 transition-colors">
-                    {item.head}
-                  </p>
-                  <p className="text-base font-bold text-slate-500 flex items-center gap-2">
-                    <ChevronRight className="w-4 h-4 text-blue-500" />
-                    {item.tail}
-                  </p>
+                {/* Back Side */}
+                <div className="absolute inset-0 backface-hidden bg-slate-900 rounded-[3rem] p-10 shadow-2xl rotate-y-180 flex flex-col justify-between overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl -mr-16 -mt-16"></div>
+
+                  <div className="relative z-10 space-y-6">
+                    <div>
+                      <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">
+                        Translation
+                      </h4>
+                      <p className="text-white text-lg font-black italic">
+                        {item.tail}
+                      </p>
+                    </div>
+
+                    {(item.example || item.usage) && (
+                      <div className="space-y-4">
+                        {item.example && (
+                          <div>
+                            <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">
+                              Example
+                            </h4>
+                            <p className="text-slate-300 text-xs font-bold leading-relaxed italic">
+                              “{item.example}”
+                            </p>
+                          </div>
+                        )}
+                        {item.usage && (
+                          <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
+                            <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">
+                              Explanation
+                            </h4>
+                            <p className="text-slate-400 text-[10px] font-bold leading-relaxed">
+                              {item.usage}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="relative z-10 flex justify-between items-center">
+                    <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest italic">
+                      {item.language} / ENGLISH FIRST
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Possible link to video detail?
+                        alert(`Project: ${item.video_id}`);
+                      }}
+                      className="text-[9px] font-black text-slate-500 hover:text-indigo-400 transition-colors flex items-center gap-2"
+                    >
+                      VIEW PROJECT
+                      <ChevronRight className="w-3 h-3" />
+                    </button>
+                  </div>
                 </div>
               </div>
-
-              {(item.example || item.usage) && (
-                <div className="mt-8 pt-6 border-t border-slate-50">
-                  {item.example && (
-                    <p className="italic text-[11px] text-slate-400 font-medium leading-relaxed bg-slate-50/50 p-4 rounded-2xl">
-                      “{item.example}”
-                    </p>
-                  )}
-                </div>
-              )}
             </div>
           );
         })}

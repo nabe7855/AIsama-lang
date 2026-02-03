@@ -59,6 +59,7 @@ export const VideoDetail = () => {
   const [isShowingPrompt, setIsShowingPrompt] = useState(false);
   const [jsonInput, setJsonInput] = useState("");
   const [parseError, setParseError] = useState<string | null>(null);
+  const [flippedIds, setFlippedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const init = async () => {
@@ -164,9 +165,9 @@ export const VideoDetail = () => {
                 ? type
                 : "vocab",
             head: i.pattern || i.word || i.phrase || i.wrong || "",
-            tail: i.meaning || i.correct || "",
-            example: i.example || i.reason || "",
-            usage: i.usage || "",
+            tail: i.meaning || i.translation || i.correct || "",
+            example: i.example || i.sentence || i.reason || "",
+            usage: i.usage || i.explanation || i.note || "",
             priority: (i.priority || "med") as any,
             active: true,
             created_at: new Date().toISOString(),
@@ -374,56 +375,121 @@ export const VideoDetail = () => {
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {learningItems
                     .filter((i) => i.language === activeTab)
                     .map((item) => (
                       <div
                         key={item.id}
-                        className={cn(
-                          "p-8 rounded-[2.5rem] border-2 flex items-center justify-between transition-all duration-300 group hover:-translate-y-1",
-                          item.active
-                            ? "bg-white border-blue-50 shadow-xl shadow-blue-500/5"
-                            : "bg-slate-50/50 border-transparent opacity-40 hover:opacity-100",
-                        )}
+                        className="relative h-80 perspective-1000 group"
+                        onClick={() => {
+                          const next = new Set(flippedIds);
+                          if (next.has(item.id)) next.delete(item.id);
+                          else next.add(item.id);
+                          setFlippedIds(next);
+                        }}
                       >
-                        <div className="flex items-center gap-5">
-                          <div
-                            className={cn(
-                              "w-4 h-4 rounded-full shadow-lg",
-                              item.type === "vocab"
-                                ? "bg-orange-500"
-                                : item.type === "grammar"
-                                  ? "bg-blue-500"
-                                  : item.type === "phrase"
-                                    ? "bg-purple-500"
-                                    : "bg-red-500",
-                            )}
-                          />
-                          <div>
-                            <p className="font-black text-slate-800 text-base leading-tight group-hover:text-blue-600 transition-colors uppercase italic">
-                              {item.head}
-                            </p>
-                            <p className="text-sm text-slate-400 font-bold mt-1">
-                              {item.tail}
+                        <div
+                          className={cn(
+                            "relative w-full h-full transition-all duration-700 preserve-3d cursor-pointer",
+                            flippedIds.has(item.id) ? "rotate-y-180" : "",
+                            !item.active && "opacity-40 grayscale-[50%]",
+                          )}
+                        >
+                          {/* Front Side */}
+                          <div className="absolute inset-0 backface-hidden bg-white border-2 border-slate-50 rounded-[3rem] p-10 shadow-xl shadow-slate-200/50 flex flex-col justify-between">
+                            <div className="flex justify-between items-start">
+                              <div
+                                className={cn(
+                                  "w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg",
+                                  item.type === "vocab"
+                                    ? "bg-orange-500"
+                                    : item.type === "grammar"
+                                      ? "bg-blue-500"
+                                      : item.type === "phrase"
+                                        ? "bg-purple-500"
+                                        : "bg-red-500",
+                                )}
+                              >
+                                {item.type === "vocab" ? (
+                                  <Tag className="w-6 h-6" />
+                                ) : item.type === "grammar" ? (
+                                  <FileText className="w-6 h-6" />
+                                ) : item.type === "phrase" ? (
+                                  <MapPin className="w-6 h-6" />
+                                ) : (
+                                  <TriangleAlert className="w-6 h-6" />
+                                )}
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleToggleItem(item.id);
+                                  }}
+                                  className={cn(
+                                    "w-10 h-10 rounded-xl flex items-center justify-center transition-all",
+                                    item.active
+                                      ? "bg-blue-600 text-white"
+                                      : "bg-slate-100 text-slate-300",
+                                  )}
+                                >
+                                  <Check className="w-5 h-5 stroke-[3px]" />
+                                </button>
+                              </div>
+                            </div>
+                            <div>
+                              <p className="text-3xl font-black text-slate-800 tracking-tight italic uppercase">
+                                {item.head}
+                              </p>
+                              <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mt-2">
+                                TAP TO REVEAL
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Back Side */}
+                          <div className="absolute inset-0 backface-hidden bg-slate-900 rounded-[3rem] p-10 shadow-2xl rotate-y-180 flex flex-col justify-between overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl -mr-16 -mt-16"></div>
+
+                            <div className="relative z-10 space-y-6">
+                              <div>
+                                <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">
+                                  Meaning
+                                </h4>
+                                <p className="text-white text-xl font-black italic">
+                                  {item.tail}
+                                </p>
+                              </div>
+
+                              {item.example && (
+                                <div>
+                                  <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">
+                                    Example
+                                  </h4>
+                                  <p className="text-slate-300 text-xs font-bold leading-relaxed">
+                                    “{item.example}”
+                                  </p>
+                                </div>
+                              )}
+
+                              {item.usage && (
+                                <div>
+                                  <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">
+                                    Usage & Note
+                                  </h4>
+                                  <p className="text-slate-400 text-[10px] font-bold leading-relaxed bg-white/5 p-4 rounded-2xl">
+                                    {item.usage}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+
+                            <p className="relative z-10 text-[9px] font-black text-slate-600 uppercase tracking-widest text-right italic">
+                              English Instruction • AIsama-lang
                             </p>
                           </div>
                         </div>
-                        <button
-                          onClick={() => handleToggleItem(item.id)}
-                          className={cn(
-                            "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-lg active:scale-90",
-                            item.active
-                              ? "bg-blue-600 text-white rotate-0"
-                              : "bg-white text-slate-300 border border-slate-100",
-                          )}
-                        >
-                          {item.active ? (
-                            <Check className="w-6 h-6 stroke-[3px]" />
-                          ) : (
-                            <Star className="w-5 h-5" />
-                          )}
-                        </button>
                       </div>
                     ))}
                   {learningItems.filter((i) => i.language === activeTab)
@@ -612,54 +678,60 @@ export const VideoDetail = () => {
             <div className="p-12 space-y-8">
               <div className="bg-slate-50 p-8 rounded-[3rem] border border-slate-100 max-h-96 overflow-y-auto scrollbar-hide">
                 <pre className="text-[11px] font-mono text-slate-600 whitespace-pre-wrap leading-relaxed">
-                  {`以下のスクリプトを分析し、学習用のJSONデータを作成してください。
+                  {`Analyze the following script and create learning JSON data.
 
-【出力形式】
-JSON形式のみで出力し、コードブロックは含めないでください。
+【Output Format】
+Output ONLY JSON. Do not include markdown code blocks.
 
-【言語設定】
-言語: "${activeTab}" (ターゲット言語)
+【Language & Instruction】
+- Target Language: "${activeTab}"
+- Instruction Language: **ENGLISH**
+- For ZH (Chinese) or ES (Spanish), provide all meanings and explanations in **ENGLISH**.
+- For EN (English), provide detailed vocabulary/grammar explanations in **ENGLISH**.
 
-【構造】
+【Structure】
 {
   "language": "${activeTab}",
-  "vocab": [{"word": "...", "meaning": "...", "usage": "..."}],
-  "grammar": [{"pattern": "...", "meaning": "...", "example": "..."}],
-  "phrases": [{"phrase": "...", "meaning": "...", "usage": "..."}],
-  "mistakes": [{"wrong": "...", "correct": "...", "reason": "..."}]
+  "vocab": [{"word": "...", "meaning": "(English Translation)", "example": "(Target Lang Sentence)", "explanation": "(English Usage Note)"}],
+  "grammar": [{"pattern": "...", "meaning": "(English Translation)", "example": "(Target Lang Sentence)", "explanation": "(English Usage Note)"}],
+  "phrases": [{"phrase": "...", "meaning": "(English Translation)", "example": "(Target Lang Sentence)", "explanation": "(English Usage Note)"}],
+  "mistakes": [{"wrong": "...", "correct": "...", "reason": "(English Explanation)"}]
 }
 
-【スクリプト本体】
-${activeScript?.text || "スクリプトが入力されていません"}
+【Script】
+${activeScript?.text || "No script provided"}
 
-分析を開始してください。`}
+Start analysis now.`}
                 </pre>
               </div>
               <button
                 onClick={() => {
-                  const prompt = `以下のスクリプトを分析し、学習用のJSONデータを作成してください。
+                  const prompt = `Analyze the following script and create learning JSON data.
 
-【出力形式】
-JSON形式のみで出力し、コードブロックは含めないでください。
+【Output Format】
+Output ONLY JSON. Do not include markdown code blocks.
 
-【言語設定】
-言語: "${activeTab}" (ターゲット言語)
+【Language & Instruction】
+- Target Language: "${activeTab}"
+- Instruction Language: **ENGLISH**
+- For ZH (Chinese) or ES (Spanish), provide all meanings and explanations in **ENGLISH**.
+- For EN (English), provide detailed vocabulary/grammar explanations in **ENGLISH**.
 
-【構造】
+【Structure】
 {
   "language": "${activeTab}",
-  "vocab": [{"word": "...", "meaning": "...", "usage": "..."}],
-  "grammar": [{"pattern": "...", "meaning": "...", "example": "..."}],
-  "phrases": [{"phrase": "...", "meaning": "...", "usage": "..."}],
-  "mistakes": [{"wrong": "...", "correct": "...", "reason": "..."}]
+  "vocab": [{"word": "...", "meaning": "(English Translation)", "example": "(Target Lang Sentence)", "explanation": "(English Usage Note)"}],
+  "grammar": [{"pattern": "...", "meaning": "(English Translation)", "example": "(Target Lang Sentence)", "explanation": "(English Usage Note)"}],
+  "phrases": [{"phrase": "...", "meaning": "(English Translation)", "example": "(Target Lang Sentence)", "explanation": "(English Usage Note)"}],
+  "mistakes": [{"wrong": "...", "correct": "...", "reason": "(English Explanation)"}]
 }
 
-【スクリプト本体】
-${activeScript?.text || "スクリプトが入力されていません"}
+【Script】
+${activeScript?.text || "No script provided"}
 
-分析を開始してください。`;
+Start analysis now.`;
                   navigator.clipboard.writeText(prompt);
-                  alert("コピーしました！");
+                  alert("Copied to clipboard!");
                 }}
                 className="w-full py-8 bg-indigo-600 text-white font-black rounded-[2.5rem] shadow-2xl shadow-indigo-200 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all duration-300 text-base tracking-[0.3em] uppercase italic flex items-center justify-center gap-4"
               >
