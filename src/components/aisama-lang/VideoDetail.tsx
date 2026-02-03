@@ -63,6 +63,7 @@ export const VideoDetail = () => {
   const [parseError, setParseError] = useState<string | null>(null);
   const [flippedIds, setFlippedIds] = useState<Set<string>>(new Set());
   const [activeItemType, setActiveItemType] = useState<ItemType | "all">("all");
+  const [isScriptCollapsed, setIsScriptCollapsed] = useState(true);
 
   useEffect(() => {
     const init = async () => {
@@ -351,13 +352,27 @@ export const VideoDetail = () => {
 
             <div className="p-6 md:p-12 flex-1 flex flex-col space-y-6 md:space-y-8">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                <h3 className="font-black text-slate-800 text-xs sm:text-sm flex items-center gap-3 w-full sm:w-auto">
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
-                    <FileText className="w-4 h-4" />
-                  </div>
-                  スクリプト編集
-                </h3>
-                {activeTab !== "JP" && (
+                <div className="flex items-center justify-between w-full sm:w-auto">
+                  <h3 className="font-black text-slate-800 text-xs sm:text-sm flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
+                      <FileText className="w-4 h-4" />
+                    </div>
+                    スクリプト編集
+                  </h3>
+                  <button
+                    onClick={() => setIsScriptCollapsed(!isScriptCollapsed)}
+                    className="lg:hidden w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-blue-50 hover:text-blue-600 transition-all"
+                  >
+                    <ChevronRight
+                      className={cn(
+                        "w-5 h-5 transition-transform duration-500",
+                        !isScriptCollapsed ? "rotate-90" : "rotate-0",
+                      )}
+                    />
+                  </button>
+                </div>
+                {(!isScriptCollapsed || activeTab === "EN") &&
+                activeTab !== "JP" ? (
                   <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-3 w-full sm:w-auto">
                     <button
                       onClick={() => setIsShowingPrompt(true)}
@@ -381,20 +396,29 @@ export const VideoDetail = () => {
                       IMPORT
                     </button>
                   </div>
-                )}
+                ) : null}
               </div>
 
-              <div className="min-h-[300px] lg:flex-1 relative">
-                <textarea
-                  className="w-full h-full p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] border-2 border-slate-50 focus:border-blue-500/20 focus:bg-white focus:ring-0 focus:outline-none text-slate-700 font-medium leading-relaxed bg-slate-50/50 text-base sm:text-lg resize-none shadow-inner transition-all"
-                  placeholder={`${activeTab}で入力してください...`}
-                  value={activeScript?.text || ""}
-                  onChange={(e) => handleScriptChange(e.target.value)}
-                />
-                <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className="px-4 py-2 bg-slate-900/80 backdrop-blur-md text-white rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-2 shadow-2xl">
-                    <Activity className="w-3 h-3 text-green-400" />
-                    Live Saving
+              <div
+                className={cn(
+                  "relative transition-all duration-500 ease-in-out overflow-hidden",
+                  isScriptCollapsed
+                    ? "max-h-0 lg:max-h-none opacity-0 lg:opacity-100"
+                    : "max-h-[800px] opacity-100 mt-6",
+                )}
+              >
+                <div className="min-h-[200px] lg:flex-1 relative">
+                  <textarea
+                    className="w-full h-full p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] border-2 border-slate-50 focus:border-blue-500/20 focus:bg-white focus:ring-0 focus:outline-none text-slate-700 font-medium leading-relaxed bg-slate-50/50 text-base sm:text-lg resize-none shadow-inner transition-all h-[400px] lg:h-full"
+                    placeholder={`${activeTab}で入力してください...`}
+                    value={activeScript?.text || ""}
+                    onChange={(e) => handleScriptChange(e.target.value)}
+                  />
+                  <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="px-4 py-2 bg-slate-900/80 backdrop-blur-md text-white rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-2 shadow-2xl">
+                      <Activity className="w-3 h-3 text-green-400" />
+                      Live Saving
+                    </div>
                   </div>
                 </div>
               </div>
@@ -480,7 +504,7 @@ export const VideoDetail = () => {
                     .map((item) => (
                       <div
                         key={item.id}
-                        className="relative h-72 sm:h-80 perspective-1000 group"
+                        className="relative h-48 sm:h-80 perspective-1000 group"
                         onClick={() => {
                           const next = new Set(flippedIds);
                           if (next.has(item.id)) next.delete(item.id);
@@ -496,11 +520,11 @@ export const VideoDetail = () => {
                           )}
                         >
                           {/* Front Side */}
-                          <div className="absolute inset-0 backface-hidden bg-white border-2 border-slate-50 rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 shadow-xl shadow-slate-200/50 flex flex-col justify-between">
+                          <div className="absolute inset-0 backface-hidden bg-white border-2 border-slate-50 rounded-[1.5rem] sm:rounded-[3rem] p-5 sm:p-10 shadow-xl shadow-slate-200/50 flex flex-col justify-between">
                             <div className="flex justify-between items-start">
                               <div
                                 className={cn(
-                                  "w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0",
+                                  "w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0",
                                   item.type === "vocab"
                                     ? "bg-orange-500"
                                     : item.type === "grammar"
@@ -538,17 +562,17 @@ export const VideoDetail = () => {
                               </div>
                             </div>
                             <div>
-                              <p className="text-xl sm:text-3xl font-black text-slate-800 tracking-tight italic uppercase truncate">
+                              <p className="text-lg sm:text-3xl font-black text-slate-800 tracking-tight italic uppercase truncate">
                                 {item.head}
                               </p>
-                              <p className="text-[8px] sm:text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mt-2">
+                              <p className="text-[7px] sm:text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mt-1 sm:mt-2">
                                 TAP TO REVEAL
                               </p>
                             </div>
                           </div>
 
                           {/* Back Side */}
-                          <div className="absolute inset-0 backface-hidden bg-slate-900 rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 shadow-2xl rotate-y-180 flex flex-col justify-between overflow-hidden">
+                          <div className="absolute inset-0 backface-hidden bg-slate-900 rounded-[1.5rem] sm:rounded-[3rem] p-5 sm:p-10 shadow-2xl rotate-y-180 flex flex-col justify-between overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl -mr-16 -mt-16"></div>
 
                             <div className="relative z-10 space-y-4 sm:space-y-6">
