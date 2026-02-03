@@ -4,9 +4,11 @@ import { clsx, type ClassValue } from "clsx";
 import {
   Bolt,
   ChevronRight,
+  FileOutput,
   LayoutDashboard,
   ListChecks,
   LogOut,
+  SquareTerminal,
   Video,
 } from "lucide-react";
 import Link from "next/link";
@@ -36,8 +38,12 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
     { name: "ダッシュボード", path: "/aisama-lang", icon: LayoutDashboard },
     { name: "動画管理", path: "/aisama-lang/videos", icon: Video },
     { name: "学習アイテム", path: "/aisama-lang/items", icon: ListChecks },
-    // { name: 'プロンプト集', path: '/aisama-lang/scripts', icon: Terminal },
-    // { name: 'CSV出力', path: '/aisama-lang/export', icon: FileOutput },
+    {
+      name: "プロンプト集",
+      path: "/aisama-lang/scripts",
+      icon: SquareTerminal,
+    },
+    { name: "CSV出力", path: "/aisama-lang/export", icon: FileOutput },
   ];
 
   const handleLogout = () => {

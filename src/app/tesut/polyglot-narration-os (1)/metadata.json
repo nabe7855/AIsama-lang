@@ -1,0 +1,8 @@
+{
+  "name": "Polyglot Narration OS",
+  "description": "A comprehensive platform for managing multilingual travel video scripts, learning items, and speaking assessments with CSV export for NotebookLM.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
