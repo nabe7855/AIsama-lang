@@ -401,15 +401,15 @@ export const VideoDetail = () => {
 
               <div
                 className={cn(
-                  "relative transition-all duration-500 ease-in-out overflow-hidden",
+                  "relative transition-all duration-500 ease-in-out overflow-hidden lg:flex-1 lg:flex lg:flex-col",
                   isScriptCollapsed
-                    ? "max-h-0 lg:max-h-none opacity-0 lg:opacity-100"
+                    ? "max-h-0 lg:max-h-none opacity-0 lg:opacity-100 lg:mt-0"
                     : "max-h-[1200px] opacity-100 mt-6",
                 )}
               >
-                <div className="min-h-[200px] lg:flex-1 relative">
+                <div className="min-h-[300px] lg:flex-1 relative flex flex-col">
                   <textarea
-                    className="w-full h-full p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] border-2 border-slate-50 focus:border-blue-500/20 focus:bg-white focus:ring-0 focus:outline-none text-slate-700 font-medium leading-relaxed bg-slate-50/50 text-base sm:text-lg resize-none shadow-inner transition-all h-[600px] lg:h-full"
+                    className="w-full flex-1 p-5 sm:p-10 rounded-2xl sm:rounded-[3rem] border-2 border-slate-50 focus:border-blue-500/20 focus:bg-white focus:ring-0 focus:outline-none text-slate-700 font-medium leading-relaxed bg-slate-50/50 text-base sm:text-lg resize-none shadow-inner transition-all h-[800px] lg:h-full"
                     placeholder={`${activeTab}で入力してください...`}
                     value={activeScript?.text || ""}
                     onChange={(e) => handleScriptChange(e.target.value)}
