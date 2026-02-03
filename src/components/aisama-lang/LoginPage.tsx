@@ -46,21 +46,21 @@ export const LoginPage = () => {
       <div className="absolute bottom-0 -right-1/4 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[120px] animation-delay-2000"></div>
 
       <div className="max-w-md w-full space-y-12 relative z-10 animate-in fade-in zoom-in-95 duration-1000">
-        <div className="text-center space-y-6">
-          <div className="inline-block w-24 h-24 bg-blue-600 rounded-[2.5rem] flex items-center justify-center shadow-[0_20px_60px_-15px_rgba(37,99,235,0.6)] transform rotate-12 hover:rotate-0 transition-all duration-700 group cursor-none">
-            <Bolt className="text-white w-12 h-12 fill-white animate-bounce group-hover:animate-none" />
+        <div className="text-center space-y-4 sm:space-y-6">
+          <div className="inline-block w-20 h-20 sm:w-24 sm:h-24 bg-blue-600 rounded-3xl sm:rounded-[2.5rem] flex items-center justify-center shadow-[0_20px_60px_-15px_rgba(37,99,235,0.6)] transform rotate-12 hover:rotate-0 transition-all duration-700 group cursor-none">
+            <Bolt className="text-white w-10 h-10 sm:w-12 sm:h-12 fill-white animate-bounce group-hover:animate-none" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-5xl font-black text-white tracking-tighter italic scale-y-110">
+            <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tighter italic scale-y-110">
               AIsama-lang OS
             </h1>
-            <p className="text-blue-400 font-black uppercase tracking-[0.4em] text-[10px] pl-2 drop-shadow-[0_0_10px_rgba(37,99,235,0.5)]">
+            <p className="text-blue-400 font-black uppercase tracking-[0.3em] sm:tracking-[0.4em] text-[9px] sm:text-[10px] pl-2 drop-shadow-[0_0_10px_rgba(37,99,235,0.5)]">
               AIsama-lang（アイ様語学）
             </p>
           </div>
         </div>
 
-        <div className="bg-white p-12 rounded-[4rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] space-y-10 border border-white/10">
+        <div className="bg-white p-8 sm:p-12 rounded-[2.5rem] sm:rounded-[4rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] space-y-8 sm:space-y-10 border border-white/10">
           <div className="flex bg-slate-100/50 p-2 rounded-[2rem] border-2 border-slate-100">
             <button
               onClick={() => setIsLogin(true)}
@@ -137,9 +137,9 @@ export const LoginPage = () => {
 
           <button
             onClick={handleGoogleLogin}
-            className="w-full py-6 border-2 border-slate-100 bg-white text-slate-600 font-bold rounded-[2rem] flex items-center justify-center gap-4 hover:bg-slate-50 hover:shadow-lg transition-all duration-300 text-xs"
+            className="w-full py-4 sm:py-6 border-2 border-slate-100 bg-white text-slate-600 font-bold rounded-2xl sm:rounded-[2rem] flex items-center justify-center gap-4 hover:bg-slate-50 hover:shadow-lg transition-all duration-300 text-xs"
           >
-            <svg className="w-6 h-6" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24">
               <path
                 fill="#4285F4"
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"

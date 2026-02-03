@@ -57,7 +57,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden">
       {/* Sidebar */}
-      <aside className="hidden md:flex flex-col w-72 bg-slate-900 text-white shadow-2xl z-20">
+      <aside className="hidden lg:flex flex-col w-72 bg-slate-900 text-white shadow-2xl z-20">
         <div className="p-8">
           <Link
             href="/aisama-lang"
@@ -102,32 +102,66 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
               <LogOut className="w-4 h-4" />
               ログアウト
             </button>
-            {/* <button
-              onClick={handleReset}
-              className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-red-500/80 hover:bg-red-500/10 transition-all text-xs font-bold"
-            >
-              <Eraser className="w-4 h-4" />
-              データを初期化
-            </button> */}
           </div>
         </nav>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="md:hidden p-4 bg-slate-900 text-white flex items-center justify-between">
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+        <header className="lg:hidden px-6 py-4 bg-white border-b border-slate-100 flex items-center justify-between sticky top-0 z-30">
           <Link
             href="/aisama-lang"
-            className="text-xl font-black italic flex items-center gap-2"
+            className="text-xl font-black italic flex items-center gap-2 text-slate-800"
           >
-            <Bolt className="w-5 h-5 text-yellow-400" />
-            AIsama-lang OS
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <Bolt className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+            </div>
+            AIsama OS
           </Link>
-          {/* Hamburger menu could be added here for mobile */}
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-slate-100 overflow-hidden border-2 border-white shadow-sm">
+              <div className="w-full h-full bg-blue-500/10 flex items-center justify-center text-[8px] font-black text-blue-600 uppercase">
+                {user?.email?.[0] || "?"}
+              </div>
+            </div>
+          </div>
         </header>
         <div className="flex-1 overflow-y-auto scroll-smooth">
-          <div className="max-w-7xl mx-auto p-4 md:p-10">{children}</div>
+          <div className="max-w-7xl mx-auto p-6 lg:p-10">{children}</div>
         </div>
+
+        {/* Mobile Bottom Navigation */}
+        <nav className="lg:hidden flex bg-white border-t border-slate-100 px-2 py-3 pb-8 safe-area-bottom sticky bottom-0 z-30 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+          {navItems.map((item) => (
+            <Link
+              key={item.path}
+              href={item.path}
+              className={cn(
+                "flex-1 flex flex-col items-center gap-1 py-1 transition-all duration-300",
+                isActive(item.path) ? "text-blue-600" : "text-slate-400",
+              )}
+            >
+              <item.icon
+                className={cn(
+                  "w-5 h-5",
+                  isActive(item.path) && "fill-blue-600/10",
+                )}
+              />
+              <span className="text-[9px] font-black uppercase tracking-tighter">
+                {item.name === "ダッシュボード"
+                  ? "HOME"
+                  : item.name === "動画管理"
+                    ? "VIDEOS"
+                    : item.name === "学習アイテム"
+                      ? "ITEMS"
+                      : "EXPORT"}
+              </span>
+              {isActive(item.path) && (
+                <div className="w-1 h-1 rounded-full bg-blue-600 mt-0.5 animate-in zoom-in duration-300" />
+              )}
+            </Link>
+          ))}
+        </nav>
       </main>
     </div>
   );

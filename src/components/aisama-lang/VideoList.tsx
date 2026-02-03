@@ -59,19 +59,19 @@ export const VideoList = () => {
 
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-700">
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 sm:gap-8 px-1">
         <div>
-          <h2 className="text-4xl font-black text-slate-800 tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-800 tracking-tight">
             動画プロジェクト
           </h2>
-          <p className="text-slate-500 font-medium mt-2 flex items-center gap-2">
+          <p className="text-sm sm:text-base text-slate-500 font-medium mt-2 flex items-center gap-2">
             <Filter className="w-4 h-4" />
             スクリプトと学習データの拠点です。
           </p>
         </div>
         <Link
           href="/aisama-lang/videos/new"
-          className="group bg-blue-600 text-white px-10 py-5 rounded-[2rem] font-black shadow-2xl shadow-blue-200 hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-3 uppercase italic tracking-widest text-sm"
+          className="group bg-slate-900 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-xl sm:rounded-[2rem] font-black shadow-xl sm:shadow-2xl shadow-slate-200 hover:bg-blue-600 hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-3 uppercase italic tracking-widest text-xs sm:text-sm w-full md:w-auto"
         >
           <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center group-hover:rotate-90 transition-transform">
             <Plus className="w-5 h-5" />
@@ -81,25 +81,25 @@ export const VideoList = () => {
       </header>
 
       {/* Search & Filter Bar */}
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex flex-col lg:flex-row gap-6 px-1">
         <div className="relative group flex-1">
-          <Search className="absolute left-8 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-300 group-focus-within:text-blue-500 transition-colors" />
+          <Search className="absolute left-6 sm:left-8 top-1/2 -translate-y-1/2 w-5 h-5 sm:w-6 sm:h-6 text-slate-300 group-focus-within:text-blue-500 transition-colors" />
           <input
             type="text"
-            placeholder="プロジェクト名またはIDで検索..."
-            className="w-full pl-20 pr-10 py-6 rounded-[2.5rem] border-2 border-slate-100 bg-white shadow-sm text-sm font-bold focus:border-blue-500/20 focus:ring-0 outline-none transition-all"
+            placeholder="プロジェクト検索..."
+            className="w-full pl-14 sm:pl-20 pr-6 sm:pr-10 py-4.5 sm:py-6 rounded-xl sm:rounded-[2.5rem] border-2 border-slate-100 bg-white shadow-sm text-xs sm:text-sm font-bold focus:border-blue-500/20 focus:ring-0 outline-none transition-all"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
-        <div className="flex bg-white p-2 rounded-[2.5rem] border-2 border-slate-100 shadow-sm overflow-x-auto whitespace-nowrap scrollbar-hide">
+        <div className="flex bg-white p-2 rounded-xl sm:rounded-[2.5rem] border-2 border-slate-100 shadow-sm overflow-x-auto whitespace-nowrap scrollbar-hide">
           <button
             onClick={() => setActiveFilter("all")}
             className={cn(
-              "px-8 py-4 text-[10px] font-black rounded-2xl transition-all duration-300 tracking-widest uppercase",
+              "px-6 sm:px-8 py-3 sm:py-4 text-[9px] sm:text-[10px] font-black rounded-lg sm:rounded-2xl transition-all duration-300 tracking-widest uppercase",
               activeFilter === "all"
-                ? "bg-slate-900 text-white shadow-xl"
+                ? "bg-slate-900 text-white shadow-lg"
                 : "text-slate-400 hover:text-slate-600",
             )}
           >
@@ -111,9 +111,9 @@ export const VideoList = () => {
                 key={s}
                 onClick={() => setActiveFilter(s)}
                 className={cn(
-                  "px-8 py-4 text-[10px] font-black rounded-2xl transition-all duration-300 tracking-widest uppercase",
+                  "px-6 sm:px-8 py-3 sm:py-4 text-[9px] sm:text-[10px] font-black rounded-lg sm:rounded-2xl transition-all duration-300 tracking-widest uppercase",
                   activeFilter === s
-                    ? "bg-blue-600 text-white shadow-xl"
+                    ? "bg-blue-600 text-white shadow-lg"
                     : "text-slate-400 hover:text-slate-600",
                 )}
               >
@@ -130,19 +130,19 @@ export const VideoList = () => {
           <Link
             key={v.video_id}
             href={`/aisama-lang/videos/${v.video_id}`}
-            className="group relative bg-white rounded-[4rem] p-10 border-2 border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 hover:-translate-y-2 transition-all duration-500 overflow-hidden flex flex-col justify-between h-[450px]"
+            className="group relative bg-white rounded-[2.5rem] sm:rounded-[4rem] p-8 sm:p-10 border-2 border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 hover:-translate-y-2 transition-all duration-500 overflow-hidden flex flex-col justify-between h-[380px] sm:h-[450px] mx-1"
           >
             {/* Background Decoration */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 blur-[50px] -mr-16 -mt-16 group-hover:bg-blue-600/10 transition-colors duration-500" />
 
             <div>
-              <div className="flex justify-between items-start mb-10">
-                <div className="w-16 h-16 rounded-[1.75rem] bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white group-hover:rotate-12 transition-all duration-500 shadow-sm border border-slate-100 group-hover:border-transparent">
-                  <Play className="w-8 h-8 fill-current" />
+              <div className="flex justify-between items-start mb-6 sm:mb-10">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl sm:rounded-[1.75rem] bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white group-hover:rotate-12 transition-all duration-500 shadow-sm border border-slate-100 group-hover:border-transparent">
+                  <Play className="w-6 h-6 sm:w-8 h-8 fill-current" />
                 </div>
                 <span
                   className={cn(
-                    "text-[9px] font-black px-6 py-2.5 rounded-full border-2 tracking-widest uppercase",
+                    "text-[8px] sm:text-[9px] font-black px-4 sm:px-6 py-2 sm:py-2.5 rounded-full border-2 tracking-widest uppercase",
                     v.status === "posted"
                       ? "bg-green-50 border-green-100 text-green-600"
                       : v.status === "recorded"
@@ -154,17 +154,17 @@ export const VideoList = () => {
                 </span>
               </div>
 
-              <h3 className="text-3xl font-black text-slate-800 leading-tight tracking-tight group-hover:text-blue-600 transition-colors mb-6">
+              <h3 className="text-2xl sm:text-3xl font-black text-slate-800 leading-tight tracking-tight group-hover:text-blue-600 transition-colors mb-4 sm:mb-6 line-clamp-2">
                 {v.title}
               </h3>
 
-              <div className="space-y-4">
-                <div className="flex items-center gap-4 text-[10px] font-black text-slate-400 tracking-widest uppercase">
-                  <Tag className="w-4 h-4 text-blue-500" />
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex items-center gap-3 sm:gap-4 text-[9px] sm:text-[10px] font-black text-slate-400 tracking-widest uppercase">
+                  <Tag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500" />
                   {v.video_id}
                 </div>
-                <div className="flex items-center gap-4 text-[10px] font-black text-slate-400 tracking-widest uppercase">
-                  <Calendar className="w-4 h-4 text-blue-500" />
+                <div className="flex items-center gap-3 sm:gap-4 text-[9px] sm:text-[10px] font-black text-slate-400 tracking-widest uppercase">
+                  <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500" />
                   {v.date}
                 </div>
                 {v.location && (
@@ -176,12 +176,12 @@ export const VideoList = () => {
               </div>
             </div>
 
-            <div className="mt-10 pt-8 border-t border-slate-50 flex items-center justify-between">
-              <span className="text-[10px] font-black text-blue-600/50 uppercase tracking-widest group-hover:text-blue-600 transition-colors">
+            <div className="mt-6 sm:mt-10 pt-6 sm:pt-8 border-t border-slate-50 flex items-center justify-between">
+              <span className="text-[9px] sm:text-[10px] font-black text-blue-600/50 uppercase tracking-widest group-hover:text-blue-600 transition-colors">
                 View Project
               </span>
-              <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
-                <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-0.5 transition-transform" />
               </div>
             </div>
           </Link>

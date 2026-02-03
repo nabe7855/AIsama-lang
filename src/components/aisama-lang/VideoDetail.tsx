@@ -266,22 +266,22 @@ export const VideoDetail = () => {
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700 pb-20">
       {/* Hero Header */}
-      <div className="bg-white p-12 rounded-[4rem] shadow-sm border border-slate-100 flex flex-col md:flex-row md:items-start justify-between gap-8 relative overflow-hidden">
+      <div className="bg-white p-6 md:p-12 rounded-[2.5rem] md:rounded-[4rem] shadow-sm border border-slate-100 flex flex-col lg:flex-row lg:items-start justify-between gap-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 blur-[100px] -mr-32 -mt-32"></div>
 
         <div className="flex-1 relative">
-          <div className="flex items-center gap-6 mb-8">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-8">
             <button
               onClick={() => router.push("/aisama-lang/videos")}
-              className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-all duration-300 shadow-sm"
+              className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-all duration-300 shadow-sm shrink-0"
             >
               <ArrowLeft className="w-6 h-6" />
             </button>
-            <div>
-              <h2 className="text-4xl font-black text-slate-800 tracking-tight leading-none">
+            <div className="text-center sm:text-left">
+              <h2 className="text-2xl sm:text-4xl font-black text-slate-800 tracking-tight leading-tight">
                 {video.title}
               </h2>
-              <div className="flex flex-wrap items-center gap-y-3 gap-x-8 text-[11px] text-slate-400 font-black uppercase tracking-[0.2em] mt-4">
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-y-3 gap-x-6 sm:gap-x-8 text-[10px] sm:text-[11px] text-slate-400 font-black uppercase tracking-[0.2em] mt-4">
                 <span className="flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full">
                   <Tag className="w-3 h-3" />
                   {video.video_id}
@@ -299,10 +299,10 @@ export const VideoDetail = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 relative">
+        <div className="flex items-center justify-center sm:justify-start gap-4 relative">
           <select
             className={cn(
-              "px-8 py-4 rounded-[1.5rem] border-2 font-black text-xs transition-all shadow-lg active:scale-95 outline-none cursor-pointer",
+              "flex-1 sm:flex-none px-6 sm:px-8 py-3 sm:py-4 rounded-2xl sm:rounded-[1.5rem] border-2 font-black text-[10px] sm:text-xs transition-all shadow-lg active:scale-95 outline-none cursor-pointer",
               video.status === "posted"
                 ? "bg-green-500 text-white border-green-500 shadow-green-200"
                 : video.status === "recorded"
@@ -320,27 +320,27 @@ export const VideoDetail = () => {
           </select>
           <button
             onClick={handleDeleteVideo}
-            className="w-14 h-14 rounded-2xl border-2 border-red-50 text-red-200 hover:bg-red-500 hover:text-white hover:border-transparent transition-all duration-300 flex items-center justify-center shadow-sm"
+            className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border-2 border-red-50 text-red-200 hover:bg-red-500 hover:text-white hover:border-transparent transition-all duration-300 flex items-center justify-center shadow-sm shrink-0"
           >
             <Trash2 className="w-6 h-6" />
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
         {/* Left Column: Script and Items */}
-        <div className="lg:col-span-8 space-y-10">
+        <div className="lg:col-span-8 space-y-8 lg:space-y-10">
           {/* Script Editor */}
-          <div className="bg-white rounded-[4rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col h-[700px] group">
-            <div className="flex bg-slate-50/50 p-3 gap-2 border-b border-slate-100">
+          <div className="bg-white rounded-[2.5rem] md:rounded-[4rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col h-auto lg:h-[700px] group">
+            <div className="flex bg-slate-50/50 p-2 sm:p-3 gap-2 border-b border-slate-100 overflow-x-auto scrollbar-hide">
               {(["JP", "EN", "ZH", "ES"] as Language[]).map((lang) => (
                 <button
                   key={lang}
                   onClick={() => setActiveTab(lang)}
                   className={cn(
-                    "flex-1 py-4 font-black text-xs transition-all duration-300 rounded-[1.25rem]",
+                    "min-w-[80px] sm:flex-1 py-3 sm:py-4 font-black text-[10px] sm:text-xs transition-all duration-300 rounded-[1rem] sm:rounded-[1.25rem]",
                     activeTab === lang
-                      ? "bg-white text-blue-600 shadow-xl shadow-slate-200/50 scale-[1.02]"
+                      ? "bg-white text-blue-600 shadow-lg sm:shadow-xl shadow-slate-200/50 scale-[1.02]"
                       : "text-slate-400 hover:text-slate-600 hover:bg-white/50",
                   )}
                 >
@@ -349,44 +349,44 @@ export const VideoDetail = () => {
               ))}
             </div>
 
-            <div className="p-12 flex-1 flex flex-col space-y-8">
-              <div className="flex justify-between items-center">
-                <h3 className="font-black text-slate-800 text-sm flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center">
+            <div className="p-6 md:p-12 flex-1 flex flex-col space-y-6 md:space-y-8">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <h3 className="font-black text-slate-800 text-xs sm:text-sm flex items-center gap-3 w-full sm:w-auto">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
                     <FileText className="w-4 h-4" />
                   </div>
                   スクリプト編集
                 </h3>
                 {activeTab !== "JP" && (
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-3 w-full sm:w-auto">
                     <button
                       onClick={() => setIsShowingPrompt(true)}
-                      className="px-6 py-3 bg-slate-100 text-slate-600 rounded-2xl font-black text-[10px] tracking-[0.2em] hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 uppercase italic"
+                      className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-slate-100 text-slate-600 rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] tracking-[0.1em] sm:tracking-[0.2em] hover:bg-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2 uppercase italic"
                     >
                       <Plus className="w-3 h-3" />
-                      GET GPT PROMPT
+                      PROMPT
                     </button>
                     <button
                       onClick={handleDownloadCSV}
-                      className="px-6 py-3 bg-white border-2 border-slate-100 text-slate-500 rounded-2xl font-black text-[10px] tracking-[0.2em] hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2 uppercase italic"
+                      className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-white border-2 border-slate-100 text-slate-500 rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] tracking-[0.1em] sm:tracking-[0.2em] hover:bg-slate-50 transition-all active:scale-95 flex items-center justify-center gap-2 uppercase italic"
                     >
                       <Download className="w-3 h-3" />
-                      DOWNLOAD CSV
+                      CSV
                     </button>
                     <button
                       onClick={() => setIsBulkImporting(true)}
-                      className="group px-6 py-3 bg-indigo-600 text-white rounded-2xl font-black text-[10px] tracking-[0.2em] hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 active:scale-95 flex items-center gap-2 uppercase font-italic"
+                      className="w-full sm:w-auto flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-indigo-600 text-white rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] tracking-[0.1em] sm:tracking-[0.2em] hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 active:scale-95 flex items-center justify-center gap-2 uppercase font-italic"
                     >
                       <Bolt className="w-3 h-3 fill-white" />
-                      AI JSON IMPORT
+                      IMPORT
                     </button>
                   </div>
                 )}
               </div>
 
-              <div className="flex-1 relative">
+              <div className="min-h-[300px] lg:flex-1 relative">
                 <textarea
-                  className="w-full h-full p-10 rounded-[3rem] border-2 border-slate-50 focus:border-blue-500/20 focus:bg-white focus:ring-0 focus:outline-none text-slate-700 font-medium leading-relaxed bg-slate-50/50 text-lg resize-none shadow-inner transition-all"
+                  className="w-full h-full p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] border-2 border-slate-50 focus:border-blue-500/20 focus:bg-white focus:ring-0 focus:outline-none text-slate-700 font-medium leading-relaxed bg-slate-50/50 text-base sm:text-lg resize-none shadow-inner transition-all"
                   placeholder={`${activeTab}で入力してください...`}
                   value={activeScript?.text || ""}
                   onChange={(e) => handleScriptChange(e.target.value)}
@@ -402,26 +402,26 @@ export const VideoDetail = () => {
           </div>
 
           {/* Training Items */}
-          <div className="bg-white rounded-[4rem] border border-slate-100 shadow-sm overflow-hidden min-h-[400px]">
-            <div className="p-12 border-b border-slate-50 flex justify-between items-center">
-              <h3 className="font-black text-slate-800 text-sm flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center">
-                  <Brain className="w-6 h-6" />
+          <div className="bg-white rounded-[2.5rem] md:rounded-[4rem] border border-slate-100 shadow-sm overflow-hidden min-h-[400px]">
+            <div className="p-6 md:p-12 border-b border-slate-50 flex flex-col sm:flex-row justify-between items-center gap-4">
+              <h3 className="font-black text-slate-800 text-xs sm:text-sm flex items-center gap-4 w-full sm:w-auto">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center shrink-0">
+                  <Brain className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
-                トレーニング・アイテム ({activeTab})
+                トレーニング ({activeTab})
               </h3>
-              <div className="px-5 py-2.5 bg-slate-50 rounded-full text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+              <div className="w-full sm:w-auto px-4 sm:px-5 py-2 sm:py-2.5 bg-slate-50 rounded-full text-[8px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center justify-center gap-2">
                 <Check className="w-3 h-3" />
-                Integrated Learning Path
+                INTEGRATED
               </div>
             </div>
 
             {/* Type Filters */}
-            <div className="px-12 py-6 bg-slate-50/30 border-b border-slate-50 flex gap-4 overflow-x-auto scrollbar-hide">
+            <div className="px-6 md:px-12 py-4 sm:py-6 bg-slate-50/30 border-b border-slate-50 flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide">
               <button
                 onClick={() => setActiveItemType("all")}
                 className={cn(
-                  "px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                  "px-6 py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all shrink-0",
                   activeItemType === "all"
                     ? "bg-slate-900 text-white shadow-lg"
                     : "text-slate-400 hover:text-slate-600 hover:bg-white/50",
@@ -435,7 +435,7 @@ export const VideoDetail = () => {
                     key={type}
                     onClick={() => setActiveItemType(type)}
                     className={cn(
-                      "px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2",
+                      "px-5 sm:px-6 py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shrink-0",
                       activeItemType === type
                         ? "bg-indigo-600 text-white shadow-lg"
                         : "text-slate-400 hover:text-slate-600 hover:bg-white/50",
@@ -459,18 +459,18 @@ export const VideoDetail = () => {
               )}
             </div>
 
-            <div className="p-12">
+            <div className="p-6 md:p-12">
               {activeTab === "JP" ? (
-                <div className="flex flex-col items-center justify-center py-24 text-slate-300 border-4 border-dashed border-slate-50 rounded-[3rem]">
-                  <div className="w-20 h-20 bg-slate-50 rounded-[2rem] flex items-center justify-center mb-6">
-                    <ChevronRight className="w-10 h-10" />
+                <div className="flex flex-col items-center justify-center py-16 sm:py-24 text-slate-300 border-4 border-dashed border-slate-50 rounded-[2rem] sm:rounded-[3rem]">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-50 rounded-[1.5rem] sm:rounded-[2rem] flex items-center justify-center mb-6">
+                    <ChevronRight className="w-8 h-8 sm:w-10 sm:h-10" />
                   </div>
-                  <p className="font-bold italic text-sm text-center max-w-xs">
+                  <p className="font-bold italic text-xs sm:text-sm text-center max-w-[200px] sm:max-w-xs leading-relaxed">
                     外国語タブを選択してアイテムを登録・管理してください
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
                   {learningItems
                     .filter(
                       (i) =>
@@ -480,7 +480,7 @@ export const VideoDetail = () => {
                     .map((item) => (
                       <div
                         key={item.id}
-                        className="relative h-80 perspective-1000 group"
+                        className="relative h-72 sm:h-80 perspective-1000 group"
                         onClick={() => {
                           const next = new Set(flippedIds);
                           if (next.has(item.id)) next.delete(item.id);
@@ -496,11 +496,11 @@ export const VideoDetail = () => {
                           )}
                         >
                           {/* Front Side */}
-                          <div className="absolute inset-0 backface-hidden bg-white border-2 border-slate-50 rounded-[3rem] p-10 shadow-xl shadow-slate-200/50 flex flex-col justify-between">
+                          <div className="absolute inset-0 backface-hidden bg-white border-2 border-slate-50 rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 shadow-xl shadow-slate-200/50 flex flex-col justify-between">
                             <div className="flex justify-between items-start">
                               <div
                                 className={cn(
-                                  "w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg",
+                                  "w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0",
                                   item.type === "vocab"
                                     ? "bg-orange-500"
                                     : item.type === "grammar"
@@ -511,13 +511,13 @@ export const VideoDetail = () => {
                                 )}
                               >
                                 {item.type === "vocab" ? (
-                                  <Tag className="w-6 h-6" />
+                                  <Tag className="w-5 h-5 sm:w-6 sm:h-6" />
                                 ) : item.type === "grammar" ? (
-                                  <FileText className="w-6 h-6" />
+                                  <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
                                 ) : item.type === "phrase" ? (
-                                  <MapPin className="w-6 h-6" />
+                                  <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />
                                 ) : (
-                                  <TriangleAlert className="w-6 h-6" />
+                                  <TriangleAlert className="w-5 h-5 sm:w-6 sm:h-6" />
                                 )}
                               </div>
                               <div className="flex items-center gap-3">
@@ -527,65 +527,65 @@ export const VideoDetail = () => {
                                     handleToggleItem(item.id);
                                   }}
                                   className={cn(
-                                    "w-10 h-10 rounded-xl flex items-center justify-center transition-all",
+                                    "w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all",
                                     item.active
                                       ? "bg-blue-600 text-white"
                                       : "bg-slate-100 text-slate-300",
                                   )}
                                 >
-                                  <Check className="w-5 h-5 stroke-[3px]" />
+                                  <Check className="w-4 h-4 sm:w-5 sm:h-5 stroke-[3px]" />
                                 </button>
                               </div>
                             </div>
                             <div>
-                              <p className="text-3xl font-black text-slate-800 tracking-tight italic uppercase">
+                              <p className="text-xl sm:text-3xl font-black text-slate-800 tracking-tight italic uppercase truncate">
                                 {item.head}
                               </p>
-                              <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mt-2">
+                              <p className="text-[8px] sm:text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mt-2">
                                 TAP TO REVEAL
                               </p>
                             </div>
                           </div>
 
                           {/* Back Side */}
-                          <div className="absolute inset-0 backface-hidden bg-slate-900 rounded-[3rem] p-10 shadow-2xl rotate-y-180 flex flex-col justify-between overflow-hidden">
+                          <div className="absolute inset-0 backface-hidden bg-slate-900 rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 shadow-2xl rotate-y-180 flex flex-col justify-between overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl -mr-16 -mt-16"></div>
 
-                            <div className="relative z-10 space-y-6">
+                            <div className="relative z-10 space-y-4 sm:space-y-6">
                               <div>
-                                <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">
+                                <h4 className="text-[8px] sm:text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1 sm:mb-2">
                                   Meaning
                                 </h4>
-                                <p className="text-white text-xl font-black italic">
+                                <p className="text-white text-base sm:text-xl font-black italic truncate">
                                   {item.tail}
                                 </p>
                               </div>
 
                               {item.example && (
-                                <div>
+                                <div className="hidden sm:block">
                                   <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">
                                     Example
                                   </h4>
-                                  <p className="text-slate-300 text-xs font-bold leading-relaxed">
+                                  <p className="text-slate-300 text-xs font-bold leading-relaxed line-clamp-2">
                                     “{item.example}”
                                   </p>
                                 </div>
                               )}
 
                               {item.usage && (
-                                <div>
-                                  <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">
-                                    Usage & Note
+                                <div className="overflow-hidden">
+                                  <h4 className="text-[8px] sm:text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1 sm:mb-2">
+                                    Usage
                                   </h4>
-                                  <p className="text-slate-400 text-[10px] font-bold leading-relaxed bg-white/5 p-4 rounded-2xl">
+                                  <p className="text-slate-400 text-[8px] sm:text-[10px] font-bold leading-relaxed bg-white/5 p-3 sm:p-4 rounded-xl sm:rounded-2xl line-clamp-3">
                                     {item.usage}
                                   </p>
                                 </div>
                               )}
                             </div>
 
-                            <p className="relative z-10 text-[9px] font-black text-slate-600 uppercase tracking-widest text-right italic">
-                              English Instruction • AIsama-lang
+                            <p className="relative z-10 text-[7px] sm:text-[9px] font-black text-slate-600 uppercase tracking-widest text-right italic">
+                              AIsama-lang OS
                             </p>
                           </div>
                         </div>
@@ -608,22 +608,22 @@ export const VideoDetail = () => {
         </div>
 
         {/* Right Column: Scoring */}
-        <div className="lg:col-span-4 space-y-10">
-          <div className="bg-white rounded-[4rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col h-[700px]">
-            <div className="p-12 border-b border-slate-50 flex justify-between items-center">
-              <h3 className="font-black text-slate-800 text-sm flex items-center gap-3">
-                <History className="w-5 h-5 text-blue-500" />
+        <div className="lg:col-span-4 space-y-8 lg:space-y-10">
+          <div className="bg-white rounded-[2.5rem] md:rounded-[4rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col min-h-auto lg:h-[700px]">
+            <div className="p-6 md:p-12 border-b border-slate-50 flex justify-between items-center">
+              <h3 className="font-black text-slate-800 text-xs sm:text-sm flex items-center gap-3">
+                <History className="w-5 h-5 text-blue-500 shrink-0" />
                 採点ログ
               </h3>
               <button
                 onClick={() => setIsAddingScore(true)}
-                className="px-8 py-3 bg-slate-900 text-white rounded-2xl font-black text-[10px] tracking-widest shadow-xl shadow-slate-200 active:scale-95 transition-all hover:bg-blue-600 uppercase"
+                className="px-6 sm:px-8 py-2.5 sm:py-3 bg-slate-900 text-white rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] tracking-widest shadow-xl shadow-slate-200 active:scale-95 transition-all hover:bg-blue-600 uppercase"
               >
                 RECORD
               </button>
             </div>
 
-            <div className="p-8 space-y-6 overflow-y-auto scrollbar-hide flex-1">
+            <div className="p-6 md:p-8 space-y-6 overflow-y-auto scrollbar-hide flex-1">
               {scores.filter((s) => s.language === activeTab).length > 0 ? (
                 scores
                   .filter((s) => s.language === activeTab)
@@ -632,9 +632,9 @@ export const VideoDetail = () => {
                     <div
                       key={score.id}
                       className={cn(
-                        "p-8 rounded-[3rem] border-2 transition-all duration-500 group overflow-hidden relative",
+                        "p-6 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border-2 transition-all duration-500 group overflow-hidden relative",
                         idx === 0
-                          ? "bg-slate-900 text-white border-transparent shadow-2xl scale-[1.02]"
+                          ? "bg-slate-900 text-white border-transparent shadow-2xl scale-[1.01]"
                           : "bg-white border-slate-50 hover:border-blue-100",
                       )}
                     >
@@ -747,7 +747,7 @@ export const VideoDetail = () => {
               )}
               <button
                 onClick={handleJsonImport}
-                className="w-full py-8 bg-indigo-600 text-white font-black rounded-[2.5rem] shadow-2xl shadow-indigo-200 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all duration-300 text-base tracking-[0.3em] uppercase italic"
+                className="w-full py-6 sm:py-8 bg-indigo-600 text-white font-black rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl shadow-indigo-200 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all duration-300 text-sm sm:text-base tracking-[0.2em] sm:tracking-[0.3em] uppercase italic"
               >
                 IMPORT KNOWLEDGE BASE
               </button>
@@ -758,27 +758,27 @@ export const VideoDetail = () => {
 
       {/* Prompt Overlay */}
       {isShowingPrompt && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-xl animate-in fade-in duration-300">
-          <div className="bg-white rounded-[4rem] shadow-[0_0_100px_rgba(0,0,0,0.2)] w-full max-w-2xl overflow-hidden animate-in slide-in-from-bottom-10 zoom-in-95 duration-500">
-            <div className="p-12 border-b border-slate-50 flex justify-between items-center">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-xl animate-in fade-in duration-300">
+          <div className="bg-white rounded-[2.5rem] sm:rounded-[4rem] shadow-[0_0_100px_rgba(0,0,0,0.2)] w-full max-w-2xl overflow-hidden animate-in slide-in-from-bottom-10 zoom-in-95 duration-500 flex flex-col max-h-[90vh]">
+            <div className="p-8 sm:p-12 border-b border-slate-50 flex justify-between items-center shrink-0">
               <div>
-                <h3 className="text-3xl font-black text-slate-800 tracking-tighter italic">
-                  GPT PROMPT TEMPLATE
+                <h3 className="text-xl sm:text-3xl font-black text-slate-800 tracking-tighter italic shrink-0">
+                  GPT PROMPT
                 </h3>
-                <p className="text-[10px] text-slate-400 font-black uppercase mt-2 tracking-widest flex items-center gap-2">
+                <p className="text-[9px] text-slate-400 font-black uppercase mt-1 sm:mt-2 tracking-widest flex items-center gap-2">
                   <Star className="w-3 h-3 text-indigo-500" />
                   Target: {activeTab}
                 </p>
               </div>
               <button
                 onClick={() => setIsShowingPrompt(false)}
-                className="w-16 h-16 rounded-[2rem] bg-slate-50 text-slate-400 hover:bg-slate-100 hover:rotate-90 transition-all duration-500 flex items-center justify-center"
+                className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl sm:rounded-[2rem] bg-slate-50 text-slate-400 hover:bg-slate-100 transition-all flex items-center justify-center"
               >
-                <X className="w-8 h-8" />
+                <X className="w-6 h-6 sm:w-8 h-8" />
               </button>
             </div>
-            <div className="p-12 space-y-8">
-              <div className="bg-slate-50 p-8 rounded-[3rem] border border-slate-100 max-h-96 overflow-y-auto scrollbar-hide">
+            <div className="p-8 sm:p-12 space-y-6 sm:space-y-8 overflow-y-auto">
+              <div className="bg-slate-50 p-6 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-slate-100 flex-1 overflow-y-auto">
                 <pre className="text-[11px] font-mono text-slate-600 whitespace-pre-wrap leading-relaxed">
                   {`Analyze the following script and create learning JSON data.
 

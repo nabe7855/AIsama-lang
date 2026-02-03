@@ -17,6 +17,7 @@ import {
   Type,
   X,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
@@ -46,6 +47,7 @@ const typeColor: Record<ItemType, string> = {
 };
 
 export const ItemsPage = () => {
+  const router = useRouter();
   const [selectedLang, setSelectedLang] =
     useState<Exclude<Language, "JP">>("EN");
   const [selectedType, setSelectedType] = useState<ItemType | "all">("all");
@@ -146,12 +148,12 @@ export const ItemsPage = () => {
 
   return (
     <div className="max-w-6xl mx-auto space-y-10 animate-in fade-in duration-700 pb-24">
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
         <div>
-          <h2 className="text-4xl font-black text-slate-800 tracking-tight">
-            学習アイテム・ライブラリ
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-800 tracking-tight">
+            アイテム・ライブラリ
           </h2>
-          <p className="text-slate-500 font-medium mt-2 flex items-center gap-2">
+          <p className="text-sm sm:text-base text-slate-500 font-medium mt-2 flex items-center gap-2">
             <Filter className="w-4 h-4" />
             全プロジェクトの知識を統合管理します。
           </p>
@@ -159,7 +161,7 @@ export const ItemsPage = () => {
         <button
           onClick={() => setShowAddForm(!showAddForm)}
           className={cn(
-            "flex items-center gap-3 px-8 py-4 rounded-2xl font-black text-sm shadow-xl transition-all duration-300",
+            "flex items-center justify-center gap-3 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm shadow-xl transition-all duration-300 w-full md:w-auto",
             showAddForm
               ? "bg-slate-200 text-slate-600"
               : "bg-slate-900 text-white hover:bg-blue-600 hover:shadow-blue-200",
@@ -175,17 +177,17 @@ export const ItemsPage = () => {
       </header>
 
       {showAddForm && (
-        <div className="bg-white p-10 rounded-[3rem] border-2 border-blue-50 shadow-2xl shadow-blue-100/30 animate-in slide-in-from-top-4 duration-500">
-          <form onSubmit={handleManualAdd} className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] border-2 border-blue-50 shadow-2xl shadow-blue-100/30 animate-in slide-in-from-top-4 duration-500 mx-1">
+          <form onSubmit={handleManualAdd} className="space-y-6 sm:space-y-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
+                <label className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
                   対象動画
                 </label>
                 <select
                   name="video_id"
                   required
-                  className="w-full p-4 rounded-2xl border-2 border-slate-50 bg-slate-50 focus:bg-white focus:border-blue-500/20 focus:ring-0 outline-none transition-all text-sm font-bold"
+                  className="w-full p-4 rounded-xl sm:rounded-2xl border-2 border-slate-50 bg-slate-50 focus:bg-white focus:border-blue-500/20 focus:ring-0 outline-none transition-all text-xs sm:text-sm font-bold"
                 >
                   <option value="">動画を選択...</option>
                   {videos.map((v) => (
@@ -196,12 +198,12 @@ export const ItemsPage = () => {
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
+                <label className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
                   種別
                 </label>
                 <select
                   name="type"
-                  className="w-full p-4 rounded-2xl border-2 border-slate-50 bg-slate-50 focus:bg-white focus:border-blue-500/20 focus:ring-0 outline-none transition-all text-sm font-bold"
+                  className="w-full p-4 rounded-xl sm:rounded-2xl border-2 border-slate-50 bg-slate-50 focus:bg-white focus:border-blue-500/20 focus:ring-0 outline-none transition-all text-xs sm:text-sm font-bold"
                 >
                   {(
                     ["vocab", "grammar", "phrase", "mistake"] as ItemType[]
@@ -213,24 +215,24 @@ export const ItemsPage = () => {
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
+                <label className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
                   Head (単語/表現)
                 </label>
                 <input
                   name="head"
                   required
-                  className="w-full p-4 rounded-2xl border-2 border-slate-50 bg-slate-50 focus:bg-white focus:border-blue-500/20 focus:ring-0 outline-none transition-all text-sm font-bold"
+                  className="w-full p-4 rounded-xl sm:rounded-2xl border-2 border-slate-50 bg-slate-50 focus:bg-white focus:border-blue-500/20 focus:ring-0 outline-none transition-all text-xs sm:text-sm font-bold"
                   placeholder="Pattern, Word, Phrase..."
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
+                <label className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
                   Tail (意味/修正)
                 </label>
                 <input
                   name="tail"
                   required
-                  className="w-full p-4 rounded-2xl border-2 border-slate-50 bg-slate-50 focus:bg-white focus:border-blue-500/20 focus:ring-0 outline-none transition-all text-sm font-bold"
+                  className="w-full p-4 rounded-xl sm:rounded-2xl border-2 border-slate-50 bg-slate-50 focus:bg-white focus:border-blue-500/20 focus:ring-0 outline-none transition-all text-xs sm:text-sm font-bold"
                   placeholder="Meaning, Correct..."
                 />
               </div>
@@ -238,7 +240,7 @@ export const ItemsPage = () => {
             <div className="flex justify-end pt-4">
               <button
                 type="submit"
-                className="px-12 py-5 bg-blue-600 text-white font-black rounded-2xl shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all hover:scale-105 active:scale-95 uppercase italic tracking-widest text-sm"
+                className="w-full sm:w-auto px-12 py-4 sm:py-5 bg-blue-600 text-white font-black rounded-xl sm:rounded-2xl shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all hover:scale-105 active:scale-95 uppercase italic tracking-widest text-xs sm:text-sm"
               >
                 アイテムを保存
               </button>
@@ -249,13 +251,13 @@ export const ItemsPage = () => {
 
       {/* Filters & Search */}
       <div className="flex flex-col lg:flex-row gap-6">
-        <div className="flex bg-white p-2 rounded-[2rem] border-2 border-slate-100 shadow-sm w-full lg:w-fit overflow-x-auto whitespace-nowrap scrollbar-hide">
+        <div className="flex bg-white p-2 rounded-2xl sm:rounded-[2rem] border-2 border-slate-100 shadow-sm w-full lg:w-fit overflow-x-auto whitespace-nowrap scrollbar-hide">
           {(["EN", "ZH", "ES"] as const).map((l) => (
             <button
               key={l}
               onClick={() => setSelectedLang(l)}
               className={cn(
-                "px-12 py-3.5 text-xs font-black rounded-2xl transition-all duration-300",
+                "flex-1 md:flex-none px-8 sm:px-12 py-3 sm:py-3.5 text-[10px] sm:text-xs font-black rounded-xl sm:rounded-2xl transition-all duration-300",
                 selectedLang === l
                   ? "bg-slate-900 text-white shadow-xl rotate-0"
                   : "text-slate-400 hover:text-slate-600 hover:bg-slate-50",
@@ -266,11 +268,11 @@ export const ItemsPage = () => {
           ))}
         </div>
 
-        <div className="flex bg-white p-2 rounded-[2rem] border-2 border-slate-100 shadow-sm w-full lg:w-fit overflow-x-auto whitespace-nowrap scrollbar-hide">
+        <div className="flex bg-white p-2 rounded-2xl sm:rounded-[2rem] border-2 border-slate-100 shadow-sm w-full lg:w-fit overflow-x-auto whitespace-nowrap scrollbar-hide">
           <button
             onClick={() => setSelectedType("all")}
             className={cn(
-              "px-8 py-3.5 text-xs font-black rounded-2xl transition-all duration-300",
+              "px-6 sm:px-8 py-3 sm:py-3.5 text-[10px] sm:text-xs font-black rounded-xl sm:rounded-2xl transition-all duration-300",
               selectedType === "all"
                 ? "bg-blue-600 text-white shadow-xl"
                 : "text-slate-400 hover:text-slate-600 hover:bg-slate-50",
@@ -284,7 +286,7 @@ export const ItemsPage = () => {
                 key={t}
                 onClick={() => setSelectedType(t)}
                 className={cn(
-                  "px-10 py-3.5 text-xs font-black rounded-2xl transition-all duration-300",
+                  "px-6 sm:px-10 py-3 sm:py-3.5 text-[10px] sm:text-xs font-black rounded-xl sm:rounded-2xl transition-all duration-300",
                   selectedType === t
                     ? "bg-blue-600 text-white shadow-xl"
                     : "text-slate-400 hover:text-slate-600 hover:bg-slate-50",
@@ -296,12 +298,12 @@ export const ItemsPage = () => {
           )}
         </div>
 
-        <div className="relative flex-1 group">
-          <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-blue-500 transition-colors" />
+        <div className="relative flex-1 group mx-1">
+          <Search className="absolute left-5 sm:left-6 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-300 group-focus-within:text-blue-500 transition-colors" />
           <input
             type="text"
             placeholder="キーワード検索..."
-            className="w-full pl-16 pr-8 py-4.5 rounded-[2rem] border-2 border-slate-100 bg-white shadow-sm text-sm font-bold focus:border-blue-500/20 focus:ring-0 outline-none transition-all"
+            className="w-full pl-12 sm:pl-16 pr-6 sm:pr-8 py-3.5 sm:py-4.5 rounded-xl sm:rounded-[2rem] border-2 border-slate-100 bg-white shadow-sm text-xs sm:text-sm font-bold focus:border-blue-500/20 focus:ring-0 outline-none transition-all"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -331,7 +333,7 @@ export const ItemsPage = () => {
                 )}
               >
                 {/* Front Side */}
-                <div className="absolute inset-0 backface-hidden bg-white border-2 border-slate-50 rounded-[3rem] p-10 shadow-xl shadow-slate-100/50 flex flex-col justify-between overflow-hidden">
+                <div className="absolute inset-0 backface-hidden bg-white border-2 border-slate-50 rounded-[2.5rem] sm:rounded-[3rem] p-8 sm:p-10 shadow-xl shadow-slate-100/50 flex flex-col justify-between overflow-hidden">
                   <div
                     className={cn(
                       "absolute top-0 right-10 w-16 h-1 blur-md",
@@ -367,59 +369,59 @@ export const ItemsPage = () => {
                           e.stopPropagation();
                           handleDelete(item.id);
                         }}
-                        className="w-10 h-10 rounded-full bg-red-50 text-red-400 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-500 hover:text-white"
+                        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-red-50 text-red-400 flex items-center justify-center opacity-100 md:opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-500 hover:text-white"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </button>
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-2xl font-black text-slate-800 leading-tight tracking-tight group-hover:text-blue-600 transition-colors uppercase italic">
+                    <h3 className="text-xl sm:text-2xl font-black text-slate-800 leading-tight tracking-tight group-hover:text-blue-600 transition-colors uppercase italic truncate">
                       {item.head}
                     </h3>
-                    <div className="flex items-center gap-2 mt-4">
-                      <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] truncate max-w-[150px]">
+                    <div className="flex items-center gap-2 mt-3 sm:mt-4">
+                      <span className="text-[9px] sm:text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] truncate max-w-[120px] sm:max-w-[150px]">
                         ID: {item.video_id}
                       </span>
                     </div>
-                    <p className="text-[9px] font-black text-slate-300 uppercase tracking-[0.2em] mt-6">
+                    <p className="text-[8px] sm:text-[9px] font-black text-slate-300 uppercase tracking-[0.2em] mt-5 sm:mt-6">
                       TAP TO LEARN
                     </p>
                   </div>
                 </div>
 
                 {/* Back Side */}
-                <div className="absolute inset-0 backface-hidden bg-slate-900 rounded-[3rem] p-10 shadow-2xl rotate-y-180 flex flex-col justify-between overflow-hidden">
+                <div className="absolute inset-0 backface-hidden bg-slate-900 rounded-[2.5rem] sm:rounded-[3rem] p-8 sm:p-10 shadow-2xl rotate-y-180 flex flex-col justify-between overflow-hidden">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl -mr-16 -mt-16"></div>
 
-                  <div className="relative z-10 space-y-6">
+                  <div className="relative z-10 space-y-4 sm:space-y-6">
                     <div>
-                      <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">
+                      <h4 className="text-[8px] sm:text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1 sm:mb-2">
                         Translation
                       </h4>
-                      <p className="text-white text-lg font-black italic">
+                      <p className="text-white text-base sm:text-lg font-black italic truncate">
                         {item.tail}
                       </p>
                     </div>
 
                     {(item.example || item.usage) && (
-                      <div className="space-y-4">
+                      <div className="space-y-3 sm:space-y-4">
                         {item.example && (
                           <div>
-                            <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">
+                            <h4 className="text-[8px] sm:text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">
                               Example
                             </h4>
-                            <p className="text-slate-300 text-xs font-bold leading-relaxed italic">
+                            <p className="text-slate-300 text-[10px] sm:text-xs font-bold leading-relaxed italic line-clamp-2">
                               “{item.example}”
                             </p>
                           </div>
                         )}
                         {item.usage && (
-                          <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
-                            <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">
+                          <div className="bg-white/5 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-white/5">
+                            <h4 className="text-[8px] sm:text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1 sm:mb-2">
                               Explanation
                             </h4>
-                            <p className="text-slate-400 text-[10px] font-bold leading-relaxed">
+                            <p className="text-slate-400 text-[8px] sm:text-[9px] font-bold leading-relaxed line-clamp-3">
                               {item.usage}
                             </p>
                           </div>
@@ -429,19 +431,18 @@ export const ItemsPage = () => {
                   </div>
 
                   <div className="relative z-10 flex justify-between items-center">
-                    <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest italic">
-                      {item.language} / ENGLISH FIRST
+                    <span className="text-[7px] sm:text-[8px] font-black text-slate-600 uppercase tracking-widest italic">
+                      {item.language} / AIsama-lang
                     </span>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        // Possible link to video detail?
-                        alert(`Project: ${item.video_id}`);
+                        router.push(`/aisama-lang/videos/${item.video_id}`);
                       }}
-                      className="text-[9px] font-black text-slate-500 hover:text-indigo-400 transition-colors flex items-center gap-2"
+                      className="text-[8px] sm:text-[9px] font-black text-slate-500 hover:text-indigo-400 transition-colors flex items-center gap-1 sm:gap-2"
                     >
-                      VIEW PROJECT
-                      <ChevronRight className="w-3 h-3" />
+                      VIEW
+                      <ChevronRight className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                     </button>
                   </div>
                 </div>

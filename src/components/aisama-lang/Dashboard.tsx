@@ -66,24 +66,24 @@ export const Dashboard = () => {
 
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <header>
-        <h2 className="text-3xl font-black text-slate-800 tracking-tight">
+      <header className="px-1">
+        <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">
           ダッシュボード
         </h2>
-        <p className="text-slate-500 font-medium mt-1">
+        <p className="text-sm sm:text-base text-slate-500 font-medium mt-1">
           進捗状況と最新スコアのサマリーです。
         </p>
       </header>
 
       {/* Status Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {(["draft", "practicing", "recorded", "posted"] as VideoStatus[]).map(
           (status) => (
             <div
               key={status}
-              className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 group hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300"
+              className="bg-white p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] shadow-sm border border-slate-100 group hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300"
             >
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+              <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 sm:mb-3 flex items-center gap-2">
                 <span
                   className={cn(
                     "w-2 h-2 rounded-full",
@@ -96,9 +96,9 @@ export const Dashboard = () => {
                 />
                 {statusLabel[status]}
               </p>
-              <p className="text-4xl font-black text-slate-800 tracking-tighter">
+              <p className="text-3xl sm:text-4xl font-black text-slate-800 tracking-tighter">
                 {statusCounts[status] || 0}
-                <span className="text-sm font-bold text-slate-300 ml-2">
+                <span className="text-xs sm:text-sm font-bold text-slate-300 ml-2">
                   PROJECTS
                 </span>
               </p>
@@ -108,11 +108,11 @@ export const Dashboard = () => {
       </div>
 
       {/* Language Scores */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
         {latestScores.map(({ lang, latest }) => (
           <div
             key={lang}
-            className="bg-white p-8 rounded-[3rem] shadow-xl shadow-slate-100 border border-slate-50 relative overflow-hidden group hover:scale-[1.02] transition-all duration-500"
+            className="bg-white p-6 sm:p-8 rounded-[2.5rem] sm:rounded-[3rem] shadow-xl shadow-slate-100 border border-slate-50 relative overflow-hidden group hover:scale-[1.02] transition-all duration-500"
           >
             <div
               className={cn(
@@ -125,10 +125,10 @@ export const Dashboard = () => {
               )}
             ></div>
 
-            <div className="flex justify-between items-center mb-10">
+            <div className="flex justify-between items-center mb-8 sm:mb-10">
               <div
                 className={cn(
-                  "w-14 h-14 rounded-[1.25rem] flex items-center justify-center font-black text-lg shadow-lg",
+                  "w-12 h-12 sm:w-14 sm:h-14 rounded-[1rem] sm:rounded-[1.25rem] flex items-center justify-center font-black text-base sm:text-lg shadow-lg",
                   lang === "EN"
                     ? "bg-blue-600 text-white"
                     : lang === "ZH"
@@ -139,7 +139,7 @@ export const Dashboard = () => {
                 {lang}
               </div>
               {latest && latest.total >= 75 && (
-                <div className="flex items-center gap-2 bg-green-500 text-white text-[10px] font-black px-4 py-2 rounded-full shadow-lg shadow-green-200 animate-pulse uppercase tracking-widest">
+                <div className="flex items-center gap-2 bg-green-500 text-white text-[8px] sm:text-[10px] font-black px-3 sm:px-4 py-1.5 sm:py-2 rounded-full shadow-lg shadow-green-200 animate-pulse uppercase tracking-widest">
                   <Activity className="w-3 h-3" />
                   POST OK
                 </div>
@@ -177,17 +177,17 @@ export const Dashboard = () => {
       </div>
 
       {/* Recent Projects */}
-      <div className="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-100">
-        <div className="flex items-center justify-between mb-10">
-          <h3 className="text-2xl font-black text-slate-800 flex items-center gap-4">
-            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center">
-              <History className="w-6 h-6" />
+      <div className="bg-white p-6 sm:p-10 rounded-[2.5rem] sm:rounded-[3rem] shadow-sm border border-slate-100">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 sm:mb-10 gap-4">
+          <h3 className="text-xl sm:text-2xl font-black text-slate-800 flex items-center gap-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 text-blue-600 rounded-xl sm:rounded-2xl flex items-center justify-center">
+              <History className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            最近のビデオプロジェクト
+            最近のプロジェクト
           </h3>
           <Link
             href="/aisama-lang/videos"
-            className="text-sm font-black text-blue-600 hover:text-blue-700 flex items-center gap-1 group"
+            className="text-xs sm:text-sm font-black text-blue-600 hover:text-blue-700 flex items-center gap-1 group w-fit"
           >
             すべて見る
             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -202,22 +202,22 @@ export const Dashboard = () => {
               <Link
                 key={v.video_id}
                 href={`/aisama-lang/videos/${v.video_id}`}
-                className="flex items-center justify-between p-6 rounded-[2rem] hover:bg-slate-50 transition-all duration-300 border-2 border-transparent hover:border-slate-100 group"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-5 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] hover:bg-slate-50 transition-all duration-300 border-2 border-transparent hover:border-slate-100 group gap-4"
               >
-                <div className="flex items-center gap-6">
-                  <div className="w-16 h-16 rounded-[1.5rem] bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white group-hover:rotate-12 transition-all duration-500 shadow-sm border border-slate-100 group-hover:border-transparent">
-                    <Play className="w-6 h-6 fill-current" />
+                <div className="flex items-center gap-4 sm:gap-6">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-[1.5rem] bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white group-hover:rotate-12 transition-all duration-500 shadow-sm border border-slate-100 group-hover:border-transparent shrink-0">
+                    <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-current" />
                   </div>
-                  <div>
-                    <h4 className="font-black text-xl text-slate-800 group-hover:text-blue-600 transition-colors">
+                  <div className="min-w-0">
+                    <h4 className="font-black text-lg sm:text-xl text-slate-800 group-hover:text-blue-600 transition-colors truncate">
                       {v.title}
                     </h4>
-                    <div className="flex items-center gap-4 mt-1">
-                      <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase flex items-center gap-1">
+                    <div className="flex items-center gap-3 sm:gap-4 mt-1">
+                      <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold tracking-widest uppercase flex items-center gap-1 shrink-0">
                         <Activity className="w-3 h-3" />
                         {v.video_id}
                       </p>
-                      <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase flex items-center gap-1">
+                      <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold tracking-widest uppercase flex items-center gap-1 shrink-0">
                         <Calendar className="w-3 h-3" />
                         {v.date}
                       </p>
@@ -226,7 +226,7 @@ export const Dashboard = () => {
                 </div>
                 <span
                   className={cn(
-                    "text-[10px] font-black px-6 py-2.5 rounded-2xl border-2 tracking-widest uppercase",
+                    "w-fit text-[8px] sm:text-[10px] font-black px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl border-2 tracking-widest uppercase",
                     v.status === "posted"
                       ? "bg-green-50 border-green-100 text-green-600"
                       : v.status === "recorded"

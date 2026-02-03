@@ -56,18 +56,18 @@ export const VideoNew = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700 pb-20">
-      <header className="flex items-center gap-6">
+      <header className="flex items-center gap-4 sm:gap-6 px-1">
         <button
           onClick={() => router.push("/aisama-lang/videos")}
-          className="w-14 h-14 rounded-2xl bg-white border-2 border-slate-50 flex items-center justify-center text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-all duration-300 shadow-sm"
+          className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white border-2 border-slate-50 flex items-center justify-center text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-all duration-300 shadow-sm shrink-0"
         >
           <ArrowLeft className="w-6 h-6" />
         </button>
         <div>
-          <h2 className="text-4xl font-black text-slate-800 tracking-tight">
+          <h2 className="text-2xl sm:text-4xl font-black text-slate-800 tracking-tight">
             新規プロジェクト
           </h2>
-          <p className="text-slate-500 font-medium mt-1">
+          <p className="text-sm sm:text-base text-slate-500 font-medium mt-1">
             新しいビデオ制作を開始します。
           </p>
         </div>
@@ -75,7 +75,7 @@ export const VideoNew = () => {
 
       <form
         onSubmit={handleSubmit}
-        className="bg-white rounded-[4rem] p-12 md:p-16 shadow-2xl shadow-slate-200/50 border border-slate-100 space-y-12"
+        className="bg-white rounded-[2.5rem] md:rounded-[4rem] p-8 sm:p-12 md:p-16 shadow-2xl shadow-slate-200/50 border border-slate-100 space-y-8 sm:space-y-12 mx-1"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           <div className="space-y-4">
@@ -87,7 +87,7 @@ export const VideoNew = () => {
               name="video_id"
               required
               placeholder="e.g. aisama-001"
-              className="w-full p-6 rounded-[1.5rem] border-2 border-slate-50 bg-slate-50/50 focus:bg-white focus:border-blue-500/20 outline-none transition-all font-bold text-lg"
+              className="w-full p-4 sm:p-6 rounded-xl sm:rounded-[1.5rem] border-2 border-slate-50 bg-slate-50/50 focus:bg-white focus:border-blue-500/20 outline-none transition-all font-bold text-base sm:text-lg"
             />
             <p className="text-[10px] text-slate-400 pl-2 font-medium">
               ※ 英数字とハイフンのみ。後で変更できません。
@@ -103,7 +103,7 @@ export const VideoNew = () => {
               name="title"
               required
               placeholder="プロジェクトの名称"
-              className="w-full p-6 rounded-[1.5rem] border-2 border-slate-50 bg-slate-50/50 focus:bg-white focus:border-blue-500/20 outline-none transition-all font-bold text-lg"
+              className="w-full p-4 sm:p-6 rounded-xl sm:rounded-[1.5rem] border-2 border-slate-50 bg-slate-50/50 focus:bg-white focus:border-blue-500/20 outline-none transition-all font-bold text-base sm:text-lg"
             />
           </div>
 
@@ -116,7 +116,7 @@ export const VideoNew = () => {
               name="date"
               type="date"
               defaultValue={new Date().toISOString().split("T")[0]}
-              className="w-full p-6 rounded-[1.5rem] border-2 border-slate-50 bg-slate-50/50 focus:bg-white focus:border-blue-500/20 outline-none transition-all font-bold text-lg"
+              className="w-full p-4 sm:p-6 rounded-xl sm:rounded-[1.5rem] border-2 border-slate-50 bg-slate-50/50 focus:bg-white focus:border-blue-500/20 outline-none transition-all font-bold text-base sm:text-lg"
             />
           </div>
 
@@ -128,7 +128,7 @@ export const VideoNew = () => {
             <input
               name="location"
               placeholder="e.g. Studio, Home, Tokyo"
-              className="w-full p-6 rounded-[1.5rem] border-2 border-slate-50 bg-slate-50/50 focus:bg-white focus:border-blue-500/20 outline-none transition-all font-bold text-lg"
+              className="w-full p-4 sm:p-6 rounded-xl sm:rounded-[1.5rem] border-2 border-slate-50 bg-slate-50/50 focus:bg-white focus:border-blue-500/20 outline-none transition-all font-bold text-base sm:text-lg"
             />
           </div>
         </div>
@@ -141,7 +141,7 @@ export const VideoNew = () => {
           <textarea
             name="memo"
             placeholder="このプロジェクトに関する詳細なメモ..."
-            className="w-full p-8 rounded-[2rem] border-2 border-slate-50 bg-slate-50/50 focus:bg-white focus:border-blue-500/20 outline-none transition-all font-medium h-40 resize-none"
+            className="w-full p-6 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] border-2 border-slate-50 bg-slate-50/50 focus:bg-white focus:border-blue-500/20 outline-none transition-all font-medium h-40 resize-none text-sm sm:text-base"
           />
         </div>
 
@@ -149,15 +149,15 @@ export const VideoNew = () => {
           <button
             type="submit"
             disabled={loading}
-            className="group relative bg-slate-900 text-white px-16 py-8 rounded-[2.5rem] font-black text-lg shadow-2xl shadow-slate-200 hover:bg-blue-600 hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center gap-4 uppercase italic tracking-widest disabled:opacity-50"
+            className="w-full sm:w-auto group relative bg-slate-900 text-white px-10 sm:px-16 py-6 sm:py-8 rounded-xl sm:rounded-[2.5rem] font-black text-base sm:text-lg shadow-2xl shadow-slate-200 hover:bg-blue-600 hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-4 uppercase italic tracking-widest disabled:opacity-50"
           >
             {loading ? (
               "INITIALIZING..."
             ) : (
               <>
-                <Bolt className="w-6 h-6 fill-current" />
+                <Bolt className="w-5 h-5 sm:w-6 sm:h-6 fill-current" />
                 Create OS Project
-                <ArrowLeft className="w-6 h-6 rotate-180" />
+                <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 rotate-180" />
               </>
             )}
           </button>
