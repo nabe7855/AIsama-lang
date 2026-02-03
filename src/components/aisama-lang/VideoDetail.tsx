@@ -332,7 +332,7 @@ export const VideoDetail = () => {
         {/* Left Column: Script and Items */}
         <div className="lg:col-span-8 space-y-8 lg:space-y-10">
           {/* Script Editor */}
-          <div className="bg-white rounded-[2.5rem] md:rounded-[4rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col h-auto lg:h-[700px] group">
+          <div className="bg-white rounded-[2.5rem] md:rounded-[4rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col h-auto lg:h-[1000px] group">
             <div className="flex bg-slate-50/50 p-2 sm:p-3 gap-2 border-b border-slate-100 overflow-x-auto scrollbar-hide">
               {(["JP", "EN", "ZH", "ES"] as Language[]).map((lang) => (
                 <button
@@ -404,12 +404,12 @@ export const VideoDetail = () => {
                   "relative transition-all duration-500 ease-in-out overflow-hidden",
                   isScriptCollapsed
                     ? "max-h-0 lg:max-h-none opacity-0 lg:opacity-100"
-                    : "max-h-[800px] opacity-100 mt-6",
+                    : "max-h-[1200px] opacity-100 mt-6",
                 )}
               >
                 <div className="min-h-[200px] lg:flex-1 relative">
                   <textarea
-                    className="w-full h-full p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] border-2 border-slate-50 focus:border-blue-500/20 focus:bg-white focus:ring-0 focus:outline-none text-slate-700 font-medium leading-relaxed bg-slate-50/50 text-base sm:text-lg resize-none shadow-inner transition-all h-[400px] lg:h-full"
+                    className="w-full h-full p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] border-2 border-slate-50 focus:border-blue-500/20 focus:bg-white focus:ring-0 focus:outline-none text-slate-700 font-medium leading-relaxed bg-slate-50/50 text-base sm:text-lg resize-none shadow-inner transition-all h-[600px] lg:h-full"
                     placeholder={`${activeTab}で入力してください...`}
                     value={activeScript?.text || ""}
                     onChange={(e) => handleScriptChange(e.target.value)}
