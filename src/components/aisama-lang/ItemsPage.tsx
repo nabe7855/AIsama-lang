@@ -333,23 +333,17 @@ export const ItemsPage = () => {
                 )}
               >
                 {/* Front Side */}
-                <div className="absolute inset-0 backface-hidden bg-white border-2 border-slate-50 rounded-[2.5rem] sm:rounded-[3rem] p-8 sm:p-10 shadow-xl shadow-slate-100/50 flex flex-col justify-between overflow-hidden">
-                  <div
-                    className={cn(
-                      "absolute top-0 right-10 w-16 h-1 blur-md",
-                      typeColor[item.type],
-                    )}
-                  />
-                  <div className="flex justify-between items-start">
+                <div className="absolute inset-0 backface-hidden bg-white border-2 border-slate-50 rounded-[2.5rem] sm:rounded-[3rem] p-8 sm:p-10 shadow-xl shadow-slate-200/40 flex flex-col items-center justify-center text-center">
+                  <div className="absolute top-8 left-8 right-8 flex justify-between items-start pointer-events-none">
                     <div
                       className={cn(
-                        "w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg",
+                        "w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg pointer-events-auto",
                         typeColor[item.type],
                       )}
                     >
                       <Icon className="w-6 h-6" />
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 pointer-events-auto">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -375,12 +369,12 @@ export const ItemsPage = () => {
                       </button>
                     </div>
                   </div>
-                  <div>
-                    <h3 className="text-xl sm:text-2xl font-black text-slate-800 leading-tight tracking-tight group-hover:text-blue-600 transition-colors uppercase italic truncate">
+                  <div className="w-full">
+                    <h3 className="text-xl sm:text-2xl font-black text-slate-800 leading-tight tracking-tight group-hover:text-blue-600 transition-colors uppercase italic break-words px-2">
                       {item.head}
                     </h3>
-                    <div className="flex items-center gap-2 mt-3 sm:mt-4">
-                      <span className="text-[9px] sm:text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] truncate max-w-[120px] sm:max-w-[150px]">
+                    <div className="flex items-center justify-center gap-2 mt-3 sm:mt-4">
+                      <span className="text-[9px] sm:text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] break-words max-w-[200px]">
                         ID: {item.video_id}
                       </span>
                     </div>
@@ -391,15 +385,15 @@ export const ItemsPage = () => {
                 </div>
 
                 {/* Back Side */}
-                <div className="absolute inset-0 backface-hidden bg-slate-900 rounded-[2.5rem] sm:rounded-[3rem] p-8 sm:p-10 shadow-2xl rotate-y-180 flex flex-col justify-between overflow-hidden">
+                <div className="absolute inset-0 backface-hidden bg-slate-900 rounded-[2.5rem] sm:rounded-[3rem] p-8 sm:p-10 shadow-2xl rotate-y-180 flex flex-col items-center justify-center text-center overflow-hidden">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl -mr-16 -mt-16"></div>
 
-                  <div className="relative z-10 space-y-4 sm:space-y-6">
+                  <div className="relative z-10 w-full space-y-4 sm:space-y-6">
                     <div>
                       <h4 className="text-[8px] sm:text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1 sm:mb-2">
                         Translation
                       </h4>
-                      <p className="text-white text-base sm:text-lg font-black italic truncate">
+                      <p className="text-white text-base sm:text-lg font-black italic break-words px-2">
                         {item.tail}
                       </p>
                     </div>
@@ -421,7 +415,7 @@ export const ItemsPage = () => {
                             <h4 className="text-[8px] sm:text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1 sm:mb-2">
                               Explanation
                             </h4>
-                            <p className="text-slate-400 text-[8px] sm:text-[9px] font-bold leading-relaxed line-clamp-3">
+                            <p className="text-slate-400 text-[8px] sm:text-[9px] font-bold leading-relaxed break-words line-clamp-3 px-1">
                               {item.usage}
                             </p>
                           </div>

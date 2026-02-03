@@ -520,11 +520,11 @@ export const VideoDetail = () => {
                           )}
                         >
                           {/* Front Side */}
-                          <div className="absolute inset-0 backface-hidden bg-white border-2 border-slate-50 rounded-[1.5rem] sm:rounded-[3rem] p-5 sm:p-10 shadow-xl shadow-slate-200/50 flex flex-col justify-between">
-                            <div className="flex justify-between items-start">
+                          <div className="absolute inset-0 backface-hidden bg-white border-2 border-slate-50 rounded-[1.5rem] sm:rounded-[3rem] p-5 sm:p-10 shadow-xl shadow-slate-200/50 flex flex-col items-center justify-center text-center">
+                            <div className="absolute top-5 left-5 right-5 flex justify-between items-start pointer-events-none">
                               <div
                                 className={cn(
-                                  "w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0",
+                                  "w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0 pointer-events-auto",
                                   item.type === "vocab"
                                     ? "bg-orange-500"
                                     : item.type === "grammar"
@@ -544,64 +544,51 @@ export const VideoDetail = () => {
                                   <TriangleAlert className="w-5 h-5 sm:w-6 sm:h-6" />
                                 )}
                               </div>
-                              <div className="flex items-center gap-3">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleToggleItem(item.id);
-                                  }}
-                                  className={cn(
-                                    "w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all",
-                                    item.active
-                                      ? "bg-blue-600 text-white"
-                                      : "bg-slate-100 text-slate-300",
-                                  )}
-                                >
-                                  <Check className="w-4 h-4 sm:w-5 sm:h-5 stroke-[3px]" />
-                                </button>
-                              </div>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleToggleItem(item.id);
+                                }}
+                                className={cn(
+                                  "w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all pointer-events-auto",
+                                  item.active
+                                    ? "bg-blue-600 text-white"
+                                    : "bg-slate-100 text-slate-300",
+                                )}
+                              >
+                                <Check className="w-4 h-4 sm:w-5 sm:h-5 stroke-[3px]" />
+                              </button>
                             </div>
-                            <div>
-                              <p className="text-lg sm:text-3xl font-black text-slate-800 tracking-tight italic uppercase truncate">
+                            <div className="w-full">
+                              <p className="text-lg sm:text-3xl font-black text-slate-800 tracking-tight italic uppercase break-words px-2">
                                 {item.head}
                               </p>
-                              <p className="text-[7px] sm:text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mt-1 sm:mt-2">
+                              <p className="text-[7px] sm:text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mt-2 sm:mt-4">
                                 TAP TO REVEAL
                               </p>
                             </div>
                           </div>
 
                           {/* Back Side */}
-                          <div className="absolute inset-0 backface-hidden bg-slate-900 rounded-[1.5rem] sm:rounded-[3rem] p-5 sm:p-10 shadow-2xl rotate-y-180 flex flex-col justify-between overflow-hidden">
+                          <div className="absolute inset-0 backface-hidden bg-slate-900 rounded-[1.5rem] sm:rounded-[3rem] p-5 sm:p-10 shadow-2xl rotate-y-180 flex flex-col items-center justify-center text-center overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl -mr-16 -mt-16"></div>
 
-                            <div className="relative z-10 space-y-4 sm:space-y-6">
+                            <div className="relative z-10 w-full space-y-4 sm:space-y-6">
                               <div>
                                 <h4 className="text-[8px] sm:text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1 sm:mb-2">
                                   Meaning
                                 </h4>
-                                <p className="text-white text-base sm:text-xl font-black italic truncate">
+                                <p className="text-white text-base sm:text-xl font-black italic break-words px-2">
                                   {item.tail}
                                 </p>
                               </div>
-
-                              {item.example && (
-                                <div className="hidden sm:block">
-                                  <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">
-                                    Example
-                                  </h4>
-                                  <p className="text-slate-300 text-xs font-bold leading-relaxed line-clamp-2">
-                                    “{item.example}”
-                                  </p>
-                                </div>
-                              )}
 
                               {item.usage && (
                                 <div className="overflow-hidden">
                                   <h4 className="text-[8px] sm:text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1 sm:mb-2">
                                     Usage
                                   </h4>
-                                  <p className="text-slate-400 text-[8px] sm:text-[10px] font-bold leading-relaxed bg-white/5 p-3 sm:p-4 rounded-xl sm:rounded-2xl line-clamp-3">
+                                  <p className="text-slate-400 text-[8px] sm:text-[10px] font-bold leading-relaxed bg-white/5 p-3 sm:p-4 rounded-xl sm:rounded-2xl break-words line-clamp-3">
                                     {item.usage}
                                   </p>
                                 </div>
