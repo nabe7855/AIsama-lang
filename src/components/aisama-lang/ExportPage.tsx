@@ -23,8 +23,9 @@ export const ExportPage = () => {
     loadItems();
   }, []);
 
-  const downloadCSV = () => {
-    if (items.length === 0) return;
+  const downloadCSV = (lang?: string) => {
+    const targetItems = lang ? items.filter((i) => i.language === lang) : items;
+    if (targetItems.length === 0) return;
 
     const headers = [
       "Language",
@@ -36,10 +37,10 @@ export const ExportPage = () => {
       "Active",
       "VideoID",
     ];
-    const rows = items.map((i) => [
+    const rows = targetItems.map((i) => [
       i.language,
       i.type,
-      `"${i.head.replace(/"/g, '""')}"`, // Escape quotes
+      `"${i.head.replace(/"/g, '""')}"`,
       `"${i.tail.replace(/"/g, '""')}"`,
       `"${i.example?.replace(/"/g, '""') || ""}"`,
       i.priority || "med",
@@ -57,12 +58,14 @@ export const ExportPage = () => {
     link.setAttribute("href", url);
     link.setAttribute(
       "download",
-      `polyglot_export_${new Date().toISOString().split("T")[0]}.csv`,
+      `aisama_export_${lang || "all"}_${new Date().toISOString().split("T")[0]}.csv`,
     );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
+
+  const languages = Array.from(new Set(items.map((i) => i.language)));
 
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700">
@@ -75,34 +78,88 @@ export const ExportPage = () => {
         </p>
       </header>
 
-      <div className="bg-white p-16 rounded-[4rem] border border-slate-100 shadow-sm flex flex-col items-center justify-center space-y-10 text-center relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-slate-50 rounded-full blur-3xl -mr-32 -mt-32 transition-transform duration-1000 group-hover:scale-125"></div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        {/* Global Export Card */}
+        <div className="bg-white p-12 rounded-[4rem] border border-slate-100 shadow-sm flex flex-col items-center justify-center space-y-8 text-center relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-slate-50 rounded-full blur-3xl -mr-24 -mt-24 transition-transform duration-1000 group-hover:scale-125"></div>
 
-        <div className="w-28 h-28 rounded-[2rem] bg-slate-50 text-slate-400 flex items-center justify-center shadow-inner relative z-10 group-hover:text-blue-600 group-hover:rotate-12 transition-all duration-500">
-          <FileDown className="w-12 h-12 stroke-[1.5]" />
+          <div className="w-20 h-20 rounded-[1.5rem] bg-slate-50 text-slate-400 flex items-center justify-center shadow-inner relative z-10 group-hover:text-blue-600 group-hover:rotate-6 transition-all duration-500">
+            <FileDown className="w-10 h-10 stroke-[1.5]" />
+          </div>
+
+          <div className="relative z-10">
+            <p className="text-3xl font-black text-slate-800 tracking-tight">
+              {loading ? "..." : `全 ${items.length} 件`}
+              <span className="text-sm text-slate-400 font-bold ml-2">
+                TOTAL ITEMS
+              </span>
+            </p>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center justify-center gap-2 mt-2">
+              <Layers className="w-3 h-3" />
+              GLOBAL DATABASE
+            </p>
+          </div>
+
+          <button
+            onClick={() => downloadCSV()}
+            disabled={loading || items.length === 0}
+            className="relative z-10 w-full py-5 bg-slate-900 text-white font-black rounded-[2rem] shadow-xl hover:bg-blue-600 active:scale-95 transition-all duration-300 text-xs tracking-[0.2em] uppercase italic flex items-center justify-center gap-4 disabled:opacity-50"
+          >
+            <Download className="w-4 h-4" />
+            ALL DATA EXPORT
+          </button>
         </div>
 
-        <div className="relative z-10 space-y-2">
-          <p className="text-4xl font-black text-slate-800 tracking-tight">
-            {loading ? "..." : `全 ${items.length} 件`}
-            <span className="text-base text-slate-400 font-bold ml-2">
-              ITEMS
-            </span>
-          </p>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center justify-center gap-2">
-            <Layers className="w-3 h-3" />
-            Ready for Processing
-          </p>
-        </div>
+        {/* Language Specific Export */}
+        <div className="bg-white p-12 rounded-[4rem] border border-slate-100 shadow-sm space-y-8 relative overflow-hidden">
+          <div className="flex items-center gap-4 mb-2">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+              <Layers className="w-5 h-5" />
+            </div>
+            <h3 className="text-xl font-black text-slate-800 tracking-tight uppercase italic">
+              Language Specific
+            </h3>
+          </div>
 
-        <button
-          onClick={downloadCSV}
-          disabled={loading || items.length === 0}
-          className="relative z-10 px-12 py-6 bg-slate-900 text-white font-black rounded-[2.5rem] shadow-2xl shadow-slate-200 hover:bg-blue-600 hover:scale-[1.02] active:scale-95 transition-all duration-300 text-sm tracking-[0.2em] uppercase italic flex items-center gap-4 disabled:opacity-50 disabled:cursor-not-allowed group-hover:shadow-blue-200"
-        >
-          <Download className="w-5 h-5 animate-bounce" />
-          CSVをダウンロード
-        </button>
+          <div className="space-y-4">
+            {loading ? (
+              <div className="py-10 text-center text-slate-300 font-bold italic">
+                Loading...
+              </div>
+            ) : languages.length === 0 ? (
+              <div className="py-10 text-center text-slate-300 font-bold italic">
+                No Data Found
+              </div>
+            ) : (
+              languages.sort().map((lang) => {
+                const langCount = items.filter(
+                  (i) => i.language === lang,
+                ).length;
+                return (
+                  <div
+                    key={lang}
+                    className="flex items-center justify-between p-6 bg-slate-50/50 rounded-3xl border border-slate-100 hover:border-blue-200 transition-colors group/row"
+                  >
+                    <div>
+                      <p className="text-lg font-black text-slate-800 italic uppercase">
+                        {lang}
+                      </p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        {langCount} Items Registered
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => downloadCSV(lang)}
+                      className="w-12 h-12 rounded-2xl bg-white text-slate-400 flex items-center justify-center shadow-sm border border-slate-100 hover:bg-blue-600 hover:text-white hover:border-transparent transition-all group-hover/row:scale-105"
+                    >
+                      <Download className="w-5 h-5" />
+                    </button>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
