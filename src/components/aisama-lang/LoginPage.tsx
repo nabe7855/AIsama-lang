@@ -3,7 +3,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { Bolt, ChevronRight, Lock, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { useAuth } from "./AuthContext";
 
@@ -16,12 +16,13 @@ export const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
-  const { signInWithGoogle, signUp, signIn, user } = useAuth();
+  const { signInWithGoogle, signUp, signIn, user, loading } = useAuth();
 
-  if (user) {
-    router.push("/aisama-lang");
-    return null;
-  }
+  useEffect(() => {
+    if (!loading && user) {
+      router.push("/aisama-lang");
+    }
+  }, [user, loading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
