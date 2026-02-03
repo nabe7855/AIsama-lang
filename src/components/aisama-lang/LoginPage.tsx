@@ -16,7 +16,7 @@ export const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
-  const { login, user } = useAuth();
+  const { signInWithGoogle, user } = useAuth();
 
   if (user) {
     router.push("/aisama-lang");
@@ -25,15 +25,14 @@ export const LoginPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && password) {
-      login(email);
-      router.push("/aisama-lang");
-    }
+    // For now, only Google Auth is fully supported with Supabase
+    alert(
+      "現在、Googleログインのみサポートされています。下のボタンを使用してください。",
+    );
   };
 
-  const handleGoogleLogin = () => {
-    login("google_user@gmail.com");
-    router.push("/aisama-lang");
+  const handleGoogleLogin = async () => {
+    await signInWithGoogle();
   };
 
   return (

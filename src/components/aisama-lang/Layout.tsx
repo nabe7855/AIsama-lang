@@ -46,9 +46,9 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
     { name: "CSV出力", path: "/aisama-lang/export", icon: FileOutput },
   ];
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (confirm("ログアウトしますか？")) {
-      logout();
+      await logout();
       router.push("/aisama-lang/login");
     }
   };
@@ -76,7 +76,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
           </Link>
           <div className="mt-4 flex items-center gap-2 text-[10px] text-slate-500 font-bold uppercase tracking-widest pl-1">
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-            {user?.name || "Guest"} Connected
+            {user?.user_metadata?.full_name || user?.email || "Guest"} Connected
           </div>
         </div>
 
