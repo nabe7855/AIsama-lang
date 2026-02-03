@@ -1,7 +1,7 @@
 "use client";
 
 import { supabase } from "@/lib/supabase";
-import { User as SupabaseUser } from "@supabase/supabase-js";
+import { Session, User as SupabaseUser } from "@supabase/supabase-js";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface AuthContextType {
@@ -24,22 +24,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     // Check active sessions and sets the user
     const getSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
-      setLoading(false);
+      if (!supabase) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        setUser(session?.user ?? null);
+      } catch (e) {
+        console.error("Failed to get session:", e);
+      } finally {
+        setLoading(false);
+      }
     };
 
     getSession();
 
+    if (!supabase) return;
+
     // Listen for changes on auth state (logged in, signed out, etc.)
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    } = supabase.auth.onAuthStateChange(
+      (_event: string, session: Session | null) => {
+        setUser(session?.user ?? null);
+        setLoading(false);
+      },
+    );
 
     return () => {
       subscription.unsubscribe();
@@ -47,6 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const signInWithGoogle = async () => {
+    if (!supabase) return;
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
@@ -62,6 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const signUp = async (email: string, pass: string) => {
+    if (!supabase) return;
     try {
       const { error } = await supabase.auth.signUp({
         email,
@@ -78,6 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const signIn = async (email: string, pass: string) => {
+    if (!supabase) return;
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
@@ -91,6 +107,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const logout = async () => {
+    if (!supabase) return;
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
