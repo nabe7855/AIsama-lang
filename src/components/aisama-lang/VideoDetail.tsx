@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/aisamaLangDb";
 import {
+  ItemType,
   Language,
   LearningItem,
   Script,
@@ -60,6 +61,7 @@ export const VideoDetail = () => {
   const [jsonInput, setJsonInput] = useState("");
   const [parseError, setParseError] = useState<string | null>(null);
   const [flippedIds, setFlippedIds] = useState<Set<string>>(new Set());
+  const [activeItemType, setActiveItemType] = useState<ItemType | "all">("all");
 
   useEffect(() => {
     const init = async () => {
@@ -364,6 +366,49 @@ export const VideoDetail = () => {
               </div>
             </div>
 
+            {/* Type Filters */}
+            <div className="px-12 py-6 bg-slate-50/30 border-b border-slate-50 flex gap-4 overflow-x-auto scrollbar-hide">
+              <button
+                onClick={() => setActiveItemType("all")}
+                className={cn(
+                  "px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                  activeItemType === "all"
+                    ? "bg-slate-900 text-white shadow-lg"
+                    : "text-slate-400 hover:text-slate-600 hover:bg-white/50",
+                )}
+              >
+                ALL
+              </button>
+              {(["vocab", "grammar", "phrase", "mistake"] as ItemType[]).map(
+                (type) => (
+                  <button
+                    key={type}
+                    onClick={() => setActiveItemType(type)}
+                    className={cn(
+                      "px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2",
+                      activeItemType === type
+                        ? "bg-indigo-600 text-white shadow-lg"
+                        : "text-slate-400 hover:text-slate-600 hover:bg-white/50",
+                    )}
+                  >
+                    {type === "vocab" && <Tag className="w-3 h-3" />}
+                    {type === "grammar" && <FileText className="w-3 h-3" />}
+                    {type === "phrase" && <MapPin className="w-3 h-3" />}
+                    {type === "mistake" && (
+                      <TriangleAlert className="w-3 h-3" />
+                    )}
+                    {type === "vocab"
+                      ? "Vocab"
+                      : type === "grammar"
+                        ? "Grammar"
+                        : type === "phrase"
+                          ? "Phrases"
+                          : "Mistakes"}
+                  </button>
+                ),
+              )}
+            </div>
+
             <div className="p-12">
               {activeTab === "JP" ? (
                 <div className="flex flex-col items-center justify-center py-24 text-slate-300 border-4 border-dashed border-slate-50 rounded-[3rem]">
@@ -377,7 +422,11 @@ export const VideoDetail = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {learningItems
-                    .filter((i) => i.language === activeTab)
+                    .filter(
+                      (i) =>
+                        i.language === activeTab &&
+                        (activeItemType === "all" || i.type === activeItemType),
+                    )
                     .map((item) => (
                       <div
                         key={item.id}
@@ -492,8 +541,11 @@ export const VideoDetail = () => {
                         </div>
                       </div>
                     ))}
-                  {learningItems.filter((i) => i.language === activeTab)
-                    .length === 0 && (
+                  {learningItems.filter(
+                    (i) =>
+                      i.language === activeTab &&
+                      (activeItemType === "all" || i.type === activeItemType),
+                  ).length === 0 && (
                     <div className="col-span-full py-20 text-center text-slate-200 font-bold border-4 border-dashed border-slate-50 rounded-[3rem] italic flex flex-col items-center gap-4">
                       <Plus className="w-12 h-12 mb-2" />
                       アイテム未登録
