@@ -1,7 +1,7 @@
 "use client";
 
 import { db } from "@/lib/aisamaLangDb";
-import { ItemType, Language, LearningItem } from "@/types/aisama-lang";
+import { ItemType, Language, LearningItem, Video } from "@/types/aisama-lang";
 import { clsx, type ClassValue } from "clsx";
 import {
   AlertTriangle,
@@ -50,41 +50,46 @@ export const ItemsPage = () => {
     useState<Exclude<Language, "JP">>("EN");
   const [selectedType, setSelectedType] = useState<ItemType | "all">("all");
   const [items, setItems] = useState<LearningItem[]>([]);
+  const [videos, setVideos] = useState<Video[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const videos = db.videos.list();
+  const refresh = async () => {
+    try {
+      let all = await db.learningItems.listAll();
+      const vList = await db.videos.list();
+      setVideos(vList);
 
-  const refresh = () => {
-    let all = db.learningItems.listAll();
+      // Filter by lang
+      all = all.filter((i) => i.language === selectedLang);
 
-    // Filter by lang
-    all = all.filter((i) => i.language === selectedLang);
+      // Filter by type
+      if (selectedType !== "all") {
+        all = all.filter((i) => i.type === selectedType);
+      }
 
-    // Filter by type
-    if (selectedType !== "all") {
-      all = all.filter((i) => i.type === selectedType);
+      // Search query
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        all = all.filter(
+          (i) =>
+            i.head.toLowerCase().includes(q) ||
+            i.tail.toLowerCase().includes(q) ||
+            i.video_id.toLowerCase().includes(q),
+        );
+      }
+
+      setItems(all.reverse());
+    } catch (error) {
+      console.error("Error refreshing items:", error);
     }
-
-    // Search query
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      all = all.filter(
-        (i) =>
-          i.head.toLowerCase().includes(q) ||
-          i.tail.toLowerCase().includes(q) ||
-          i.video_id.toLowerCase().includes(q),
-      );
-    }
-
-    setItems(all.reverse());
   };
 
   useEffect(() => {
     refresh();
   }, [selectedLang, selectedType, searchQuery]);
 
-  const handleManualAdd = (e: React.FormEvent) => {
+  const handleManualAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
     const d = new FormData(form);
@@ -95,34 +100,46 @@ export const ItemsPage = () => {
 
     if (!vId || !head || !tail) return alert("必須項目を入力してください");
 
-    db.learningItems.add({
-      id: Math.random().toString(36).substring(2, 9),
-      video_id: vId,
-      language: selectedLang,
-      type: type || (selectedType === "all" ? "vocab" : selectedType),
-      head,
-      tail,
-      example: d.get("example") as string,
-      usage: d.get("usage") as string,
-      priority: "med",
-      active: true,
-      created_at: new Date().toISOString(),
-    });
+    try {
+      await db.learningItems.add({
+        id: Math.random().toString(36).substring(2, 9),
+        video_id: vId,
+        language: selectedLang,
+        type: type || (selectedType === "all" ? "vocab" : selectedType),
+        head,
+        tail,
+        example: d.get("example") as string,
+        usage: d.get("usage") as string,
+        priority: "med",
+        active: true,
+        created_at: new Date().toISOString(),
+      });
 
-    form.reset();
-    setShowAddForm(false);
-    refresh();
+      form.reset();
+      setShowAddForm(false);
+      await refresh();
+    } catch (error) {
+      console.error("Error adding item:", error);
+    }
   };
 
-  const handleToggle = (id: string) => {
-    db.learningItems.toggleActive(id);
-    refresh();
+  const handleToggle = async (id: string) => {
+    try {
+      await db.learningItems.toggleActive(id);
+      await refresh();
+    } catch (error) {
+      console.error("Error toggling item:", error);
+    }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm("削除しますか？")) {
-      db.learningItems.delete(id);
-      refresh();
+      try {
+        await db.learningItems.delete(id);
+        await refresh();
+      } catch (error) {
+        console.error("Error deleting item:", error);
+      }
     }
   };
 

@@ -35,7 +35,15 @@ export const VideoList = () => {
   const [activeFilter, setActiveFilter] = useState<VideoStatus | "all">("all");
 
   useEffect(() => {
-    setVideos(db.videos.list());
+    const fetchVideos = async () => {
+      try {
+        const vList = await db.videos.list();
+        setVideos(vList);
+      } catch (error) {
+        console.error("Error fetching videos:", error);
+      }
+    };
+    fetchVideos();
   }, []);
 
   const filtered = videos

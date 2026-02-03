@@ -60,19 +60,33 @@ export const VideoDetail = () => {
   const [parseError, setParseError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (id) {
-      const v = db.videos.get(id);
-      if (v) {
-        setVideo(v);
-        refreshData(id);
+    const init = async () => {
+      if (id) {
+        try {
+          const v = await db.videos.get(id);
+          if (v) {
+            setVideo(v);
+            await refreshData(id);
+          }
+        } catch (error) {
+          console.error("Error loading video:", error);
+        }
       }
-    }
+    };
+    init();
   }, [id]);
 
-  const refreshData = (videoId: string) => {
-    setScripts(db.scripts.list(videoId));
-    setLearningItems(db.learningItems.list(videoId));
-    setScores(db.scores.list(videoId));
+  const refreshData = async (videoId: string) => {
+    try {
+      const sList = await db.scripts.list(videoId);
+      const iList = await db.learningItems.list(videoId);
+      const scList = await db.scores.list(videoId);
+      setScripts(sList);
+      setLearningItems(iList);
+      setScores(scList);
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+    }
   };
 
   if (!video) return null;
@@ -82,7 +96,7 @@ export const VideoDetail = () => {
     currentScripts.find((s) => s.active) ||
     currentScripts[currentScripts.length - 1];
 
-  const handleScriptChange = (text: string) => {
+  const handleScriptChange = async (text: string) => {
     if (!video) return;
     const nextVer =
       (currentScripts.length > 0
@@ -105,11 +119,16 @@ export const VideoDetail = () => {
       active: true,
       created_at: new Date().toISOString(),
     };
-    db.scripts.add(newScript);
-    setScripts(db.scripts.list(video.video_id));
+    try {
+      await db.scripts.add(newScript);
+      const sList = await db.scripts.list(video.video_id);
+      setScripts(sList);
+    } catch (error) {
+      console.error("Error adding script:", error);
+    }
   };
 
-  const handleJsonImport = () => {
+  const handleJsonImport = async () => {
     if (!video) return;
     setParseError(null);
     try {
@@ -147,8 +166,10 @@ export const VideoDetail = () => {
           });
         });
       });
-      db.learningItems.addMany(mapped);
-      setLearningItems(db.learningItems.list(video.video_id));
+
+      await db.learningItems.addMany(mapped);
+      const iList = await db.learningItems.list(video.video_id);
+      setLearningItems(iList);
       setIsBulkImporting(false);
       setJsonInput("");
     } catch (e: any) {
@@ -156,23 +177,36 @@ export const VideoDetail = () => {
     }
   };
 
-  const handleToggleItem = (itemId: string) => {
+  const handleToggleItem = async (itemId: string) => {
     if (!video) return;
-    db.learningItems.toggleActive(itemId);
-    setLearningItems(db.learningItems.list(video.video_id));
+    try {
+      await db.learningItems.toggleActive(itemId);
+      const iList = await db.learningItems.list(video.video_id);
+      setLearningItems(iList);
+    } catch (error) {
+      console.error("Error toggling item:", error);
+    }
   };
 
-  const handleUpdateStatus = (status: VideoStatus) => {
+  const handleUpdateStatus = async (status: VideoStatus) => {
     if (!video) return;
     const updated = { ...video, status, updated_at: new Date().toISOString() };
-    db.videos.upsert(updated);
-    setVideo(updated);
+    try {
+      await db.videos.upsert(updated);
+      setVideo(updated);
+    } catch (error) {
+      console.error("Error updating status:", error);
+    }
   };
 
-  const handleDeleteVideo = () => {
+  const handleDeleteVideo = async () => {
     if (confirm("このプロジェクトを完全に削除しますか？")) {
-      db.videos.delete(video.video_id);
-      router.push("/aisama-lang/videos");
+      try {
+        await db.videos.delete(video.video_id);
+        router.push("/aisama-lang/videos");
+      } catch (error) {
+        console.error("Error deleting video:", error);
+      }
     }
   };
 
@@ -579,9 +613,17 @@ export const VideoDetail = () => {
                   comment: d.get("comment") as string,
                   created_at: new Date().toISOString(),
                 };
-                db.scores.add(score);
-                setScores(db.scores.list(video.video_id));
-                setIsAddingScore(false);
+                const addScore = async () => {
+                  try {
+                    await db.scores.add(score);
+                    const scList = await db.scores.list(video.video_id);
+                    setScores(scList);
+                    setIsAddingScore(false);
+                  } catch (error) {
+                    console.error("Error adding score:", error);
+                  }
+                };
+                addScore();
               }}
             >
               <div className="grid grid-cols-4 gap-6">

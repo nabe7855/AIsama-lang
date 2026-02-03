@@ -18,7 +18,7 @@ export const VideoNew = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     const form = e.target as HTMLFormElement;
@@ -45,8 +45,13 @@ export const VideoNew = () => {
       updated_at: new Date().toISOString(),
     };
 
-    db.videos.upsert(newVideo);
-    router.push(`/aisama-lang/videos/${videoId}`);
+    try {
+      await db.videos.upsert(newVideo);
+      router.push(`/aisama-lang/videos/${videoId}`);
+    } catch (error) {
+      console.error("Error creating video:", error);
+      setLoading(false);
+    }
   };
 
   return (

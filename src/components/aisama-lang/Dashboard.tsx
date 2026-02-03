@@ -33,27 +33,35 @@ export const Dashboard = () => {
   const [latestScores, setLatestScores] = useState<any[]>([]);
 
   useEffect(() => {
-    const vList = db.videos.list();
-    setVideos(vList);
+    const fetchData = async () => {
+      try {
+        const vList = await db.videos.list();
+        setVideos(vList);
 
-    const counts = vList.reduce(
-      (acc, v) => {
-        acc[v.status] = (acc[v.status] || 0) + 1;
-        return acc;
-      },
-      {} as Record<string, number>,
-    );
-    setStatusCounts(counts);
+        const counts = vList.reduce(
+          (acc, v) => {
+            acc[v.status] = (acc[v.status] || 0) + 1;
+            return acc;
+          },
+          {} as Record<string, number>,
+        );
+        setStatusCounts(counts);
 
-    const allScores = db.scores.listAll();
-    const scores = (["EN", "ZH", "ES"] as const).map((lang) => {
-      const langScores = allScores.filter((s) => s.language === lang);
-      const latest = langScores.sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-      )[0];
-      return { lang, latest };
-    });
-    setLatestScores(scores);
+        const allScores = await db.scores.listAll();
+        const scores = (["EN", "ZH", "ES"] as const).map((lang) => {
+          const langScores = allScores.filter((s) => s.language === lang);
+          const latest = langScores.sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+          )[0];
+          return { lang, latest };
+        });
+        setLatestScores(scores);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   return (

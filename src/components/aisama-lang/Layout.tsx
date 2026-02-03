@@ -1,11 +1,9 @@
 "use client";
 
-import { db } from "@/lib/aisamaLangDb";
 import { clsx, type ClassValue } from "clsx";
 import {
   Bolt,
   ChevronRight,
-  Eraser,
   LayoutDashboard,
   ListChecks,
   LogOut,
@@ -49,12 +47,12 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const handleReset = () => {
-    if (confirm("データをすべて削除しますか？")) {
-      db.clearAll();
-      window.location.reload();
-    }
-  };
+  // const handleReset = () => {
+  //   if (confirm("データをすべて削除しますか？")) {
+  //     db.clearAll();
+  //     window.location.reload();
+  //   }
+  // };
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden">
@@ -104,13 +102,13 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
               <LogOut className="w-4 h-4" />
               ログアウト
             </button>
-            <button
+            {/* <button
               onClick={handleReset}
               className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-red-500/80 hover:bg-red-500/10 transition-all text-xs font-bold"
             >
               <Eraser className="w-4 h-4" />
               データを初期化
-            </button>
+            </button> */}
           </div>
         </nav>
       </aside>

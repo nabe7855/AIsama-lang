@@ -4,119 +4,190 @@ import {
   SpeakingScore,
   Video,
 } from "@/types/aisama-lang";
-
-const STORAGE_KEY = "aisama_lang_db";
-
-interface DBState {
-  videos: Video[];
-  scripts: Script[];
-  learningItems: LearningItem[];
-  speakingScores: SpeakingScore[];
-}
-
-const initialState: DBState = {
-  videos: [],
-  scripts: [],
-  learningItems: [],
-  speakingScores: [],
-};
-
-// Internal function to retrieve the full database state from localStorage
-export const getDB = (): DBState => {
-  if (typeof window === "undefined") return initialState;
-  const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : initialState;
-};
-
-// Internal function to persist the database state to localStorage
-export const saveDB = (state: DBState) => {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-};
+import { supabase } from "./supabase";
 
 export const db = {
-  getDB,
-  saveDB,
   videos: {
-    list: () => getDB().videos,
-    get: (id: string) => getDB().videos.find((v) => v.video_id === id),
-    upsert: (video: Video) => {
-      const state = getDB();
-      const index = state.videos.findIndex(
-        (v) => v.video_id === video.video_id,
-      );
-      if (index > -1) {
-        state.videos[index] = { ...state.videos[index], ...video };
-      } else {
-        state.videos.push(video);
-      }
-      saveDB(state);
+    list: async () => {
+      const { data, error } = await supabase
+        .from("videos")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as Video[];
     },
-    delete: (id: string) => {
-      const state = getDB();
-      state.videos = state.videos.filter((v) => v.video_id !== id);
-      state.scripts = state.scripts.filter((s) => s.video_id !== id);
-      state.learningItems = state.learningItems.filter(
-        (i) => i.video_id !== id,
+    get: async (id: string) => {
+      const { data, error } = await supabase
+        .from("videos")
+        .select("*")
+        .eq("video_id", id)
+        .single();
+      if (error && error.code !== "PGRST116") throw error; // PGRST116 is "no rows found"
+      return data as Video | null;
+    },
+    upsert: async (video: Video) => {
+      const { error } = await supabase.from("videos").upsert(
+        {
+          video_id: video.video_id,
+          title: video.title,
+          date: video.date,
+          location: video.location,
+          memo: video.memo,
+          status: video.status,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "video_id" },
       );
-      state.speakingScores = state.speakingScores.filter(
-        (s) => s.video_id !== id,
-      );
-      saveDB(state);
+      if (error) throw error;
+    },
+    delete: async (id: string) => {
+      const { error } = await supabase
+        .from("videos")
+        .delete()
+        .eq("video_id", id);
+      if (error) throw error;
     },
   },
   scripts: {
-    list: (videoId: string) =>
-      getDB().scripts.filter((s) => s.video_id === videoId),
-    add: (script: Script) => {
-      const state = getDB();
-      // Deactivate others of same lang/level for this video
-      state.scripts = state.scripts.map((s) =>
-        s.video_id === script.video_id && s.language === script.language
-          ? { ...s, active: false }
-          : s,
-      );
-      state.scripts.push({ ...script, active: true });
-      saveDB(state);
+    list: async (videoId: string) => {
+      const { data, error } = await supabase
+        .from("scripts")
+        .select("*")
+        .eq("video_id", videoId)
+        .order("version", { ascending: true });
+      if (error) throw error;
+      return data as Script[];
+    },
+    add: async (script: Script) => {
+      // Deactivate others of same lang for this video
+      const { error: updateError } = await supabase
+        .from("scripts")
+        .update({ active: false })
+        .eq("video_id", script.video_id)
+        .eq("language", script.language);
+
+      if (updateError) throw updateError;
+
+      const { error } = await supabase.from("scripts").insert({
+        video_id: script.video_id,
+        language: script.language,
+        level: script.level,
+        version: script.version,
+        text: script.text,
+        active: true,
+      });
+      if (error) throw error;
     },
   },
   learningItems: {
-    listAll: () => getDB().learningItems,
-    list: (videoId: string) =>
-      getDB().learningItems.filter((i) => i.video_id === videoId),
-    add: (item: LearningItem) => {
-      const state = getDB();
-      state.learningItems.push(item);
-      saveDB(state);
+    listAll: async () => {
+      const { data, error } = await supabase
+        .from("learning_items")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as LearningItem[];
     },
-    addMany: (items: LearningItem[]) => {
-      const state = getDB();
-      state.learningItems.push(...items);
-      saveDB(state);
+    list: async (videoId: string) => {
+      const { data, error } = await supabase
+        .from("learning_items")
+        .select("*")
+        .eq("video_id", videoId)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as LearningItem[];
     },
-    toggleActive: (id: string) => {
-      const state = getDB();
-      const item = state.learningItems.find((i) => i.id === id);
-      if (item) item.active = !item.active;
-      saveDB(state);
+    add: async (item: LearningItem) => {
+      const { error } = await supabase.from("learning_items").insert({
+        video_id: item.video_id,
+        language: item.language,
+        type: item.type,
+        head: item.head,
+        tail: item.tail,
+        example: item.example,
+        usage: item.usage,
+        priority: item.priority || "med",
+        active: item.active,
+      });
+      if (error) throw error;
     },
-    delete: (id: string) => {
-      const state = getDB();
-      state.learningItems = state.learningItems.filter((i) => i.id !== id);
-      saveDB(state);
+    addMany: async (items: LearningItem[]) => {
+      const { error } = await supabase.from("learning_items").insert(
+        items.map((item) => ({
+          video_id: item.video_id,
+          language: item.language,
+          type: item.type,
+          head: item.head,
+          tail: item.tail,
+          example: item.example,
+          usage: item.usage,
+          priority: item.priority || "med",
+          active: item.active,
+        })),
+      );
+      if (error) throw error;
+    },
+    toggleActive: async (id: string) => {
+      // Need to find existing first if using UUID from supabase vs logic
+      // But let's assume 'id' here is the primary key.
+      // Current localStorage logic uses random string.
+      // In Supabase, it will be UUID.
+      const { data: item, error: getError } = await supabase
+        .from("learning_items")
+        .select("active")
+        .eq("id", id)
+        .single();
+
+      if (getError) throw getError;
+
+      const { error } = await supabase
+        .from("learning_items")
+        .update({ active: !item.active })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    delete: async (id: string) => {
+      const { error } = await supabase
+        .from("learning_items")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
     },
   },
   scores: {
-    list: (videoId: string) =>
-      getDB().speakingScores.filter((s) => s.video_id === videoId),
-    listAll: () => getDB().speakingScores,
-    add: (score: SpeakingScore) => {
-      const state = getDB();
-      state.speakingScores.push(score);
-      saveDB(state);
+    list: async (videoId: string) => {
+      const { data, error } = await supabase
+        .from("speaking_scores")
+        .select("*")
+        .eq("video_id", videoId)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as SpeakingScore[];
     },
-  },
-  clearAll: () => {
-    saveDB(initialState);
+    listAll: async () => {
+      const { data, error } = await supabase
+        .from("speaking_scores")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as SpeakingScore[];
+    },
+    add: async (score: SpeakingScore) => {
+      const { error } = await supabase.from("speaking_scores").insert({
+        video_id: score.video_id,
+        language: score.language,
+        date: score.date,
+        script_version: score.script_version,
+        pronunciation: score.pronunciation,
+        grammar: score.grammar,
+        fluency: score.fluency,
+        clarity: score.clarity,
+        total: score.total,
+        main_problem: score.main_problem,
+        improvement_tip: score.improvement_tip,
+        comment: score.comment,
+      });
+      if (error) throw error;
+    },
   },
 };
