@@ -71,7 +71,7 @@ export const ExportPage = () => {
           CSVエクスポート
         </h2>
         <p className="text-slate-500 font-medium mt-1">
-          学習アイテムをCSV形式で出力します。AnkiやNotebookLMへのインポートに利用できます。
+          学習アイテムをCSV形式で出力します。Ankiなどへのインポートに利用できます。
         </p>
       </header>
 
