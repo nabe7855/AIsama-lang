@@ -76,12 +76,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const signUp = async (email: string, pass: string) => {
-    if (!supabase) return;
+    console.log("Attempting sign up for:", email);
+    if (!supabase) {
+      console.error("Sign up failed: Supabase client is not initialized.");
+      alert(
+        "エラー: Supabaseの設定が見つかりません。環境変数を確認してください。",
+      );
+      return;
+    }
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password: pass,
       });
+      console.log("Sign up response:", { data, error });
       if (error) throw error;
       alert(
         "確認メールを送信しました。メール内のリンクをクリックして登録を完了してください。",
