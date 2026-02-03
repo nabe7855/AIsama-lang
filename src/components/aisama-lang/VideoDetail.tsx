@@ -20,6 +20,7 @@ import {
   Check,
   ChevronRight,
   Copy,
+  Download,
   FileText,
   History,
   MapPin,
@@ -187,6 +188,48 @@ export const VideoDetail = () => {
     }
   };
 
+  const handleDownloadCSV = () => {
+    if (!video) return;
+    const items = learningItems.filter((i) => i.language === activeTab);
+    if (items.length === 0) {
+      alert("ダウンロードするアイテムがありません。");
+      return;
+    }
+
+    const headers = [
+      "Head",
+      "Tail",
+      "Type",
+      "Example",
+      "Usage/Note",
+      "Priority",
+    ];
+    const rows = items.map((item) => [
+      `"${item.head.replace(/"/g, '""')}"`,
+      `"${item.tail.replace(/"/g, '""')}"`,
+      item.type.toUpperCase(),
+      `"${(item.example || "").replace(/"/g, '""')}"`,
+      `"${(item.usage || "").replace(/"/g, '""')}"`,
+      item.priority.toUpperCase(),
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((r) => r.join(",")),
+    ].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `aisama_${video.video_id}_${activeTab}_${new Date().toISOString().split("T")[0]}.csv`,
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleToggleItem = async (itemId: string) => {
     if (!video) return;
     try {
@@ -322,6 +365,13 @@ export const VideoDetail = () => {
                     >
                       <Plus className="w-3 h-3" />
                       GET GPT PROMPT
+                    </button>
+                    <button
+                      onClick={handleDownloadCSV}
+                      className="px-6 py-3 bg-white border-2 border-slate-100 text-slate-500 rounded-2xl font-black text-[10px] tracking-[0.2em] hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2 uppercase italic"
+                    >
+                      <Download className="w-3 h-3" />
+                      DOWNLOAD CSV
                     </button>
                     <button
                       onClick={() => setIsBulkImporting(true)}
