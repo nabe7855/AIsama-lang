@@ -414,7 +414,13 @@ export const VideoDetail = () => {
             <div className="p-6 md:p-8 flex flex-col min-h-[300px] sm:min-h-[400px]">
               {scores.filter((s) => s.language === activeTab).length > 0 ? (
                 <div className="w-full min-w-0 h-[300px] mt-4 cursor-pointer relative z-10">
-                  <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                  <ResponsiveContainer
+                    width="100%"
+                    height="100%"
+                    minWidth={0}
+                    minHeight={0}
+                    debounce={50}
+                  >
                     <LineChart
                       data={scores
                         .filter((s) => s.language === activeTab)
