@@ -754,6 +754,20 @@ export const VideoDetail = () => {
                                       )}
                                     />
                                   </button>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleToggleItem(item.id);
+                                    }}
+                                    className={cn(
+                                      "w-7 h-7 rounded-lg flex items-center justify-center transition-all",
+                                      item.active
+                                        ? "bg-blue-600 text-white"
+                                        : "bg-slate-100 text-slate-300",
+                                    )}
+                                  >
+                                    <Check className="w-4 h-4 stroke-[3px]" />
+                                  </button>
                                 </div>
                               </div>
                               <p className="text-xl font-black text-slate-800 tracking-tight italic uppercase break-words px-2 mt-4">
