@@ -413,7 +413,7 @@ export const VideoDetail = () => {
 
             <div className="p-6 md:p-8 flex flex-col min-h-[300px] sm:min-h-[400px]">
               {scores.filter((s) => s.language === activeTab).length > 0 ? (
-                <div className="w-full h-[300px] mt-4">
+                <div className="w-full h-[300px] mt-4 cursor-pointer relative z-10">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart
                       data={scores
@@ -423,7 +423,7 @@ export const VideoDetail = () => {
                             new Date(a.date).getTime() -
                             new Date(b.date).getTime(),
                         )}
-                      margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 0 }}
                       onClick={(data: any) => {
                         if (data && data.activePayload) {
                           const date = data.activePayload[0].payload.date;
