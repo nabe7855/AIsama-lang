@@ -1,6 +1,5 @@
-"use client";
-
 import { Language, SpeakingScore } from "@/types/aisama-lang";
+import { useEffect, useState } from "react";
 import {
   CartesianGrid,
   Line,
@@ -22,9 +21,21 @@ export const ScoreChart = ({
   activeTab,
   onPointClick,
 }: ScoreChartProps) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const chartData = scores
     .filter((s) => s.language === activeTab)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  if (!mounted) {
+    return (
+      <div className="w-full h-[300px] bg-slate-50/50 rounded-[2rem] animate-pulse mt-4" />
+    );
+  }
 
   if (chartData.length === 0) {
     return (
@@ -41,7 +52,13 @@ export const ScoreChart = ({
       className="w-full mt-4 cursor-pointer relative z-10"
       style={{ width: "100%", height: 300, minWidth: 0 }}
     >
-      <ResponsiveContainer width="100%" height="100%" debounce={300}>
+      <ResponsiveContainer
+        width="100%"
+        height="100%"
+        debounce={300}
+        minWidth={0}
+        minHeight={0}
+      >
         <LineChart
           data={chartData}
           margin={{ top: 20, right: 30, left: 10, bottom: 0 }}
