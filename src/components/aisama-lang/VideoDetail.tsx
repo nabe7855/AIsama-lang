@@ -65,6 +65,9 @@ export const VideoDetail = () => {
   const [activeItemType, setActiveItemType] = useState<ItemType | "all">("all");
   const [isScriptCollapsed, setIsScriptCollapsed] = useState(true);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [isImportingScore, setIsImportingScore] = useState(false);
+  const [isShowingScorePrompt, setIsShowingScorePrompt] = useState(false);
+  const [scoreJsonInput, setScoreJsonInput] = useState("");
 
   useEffect(() => {
     const init = async () => {
@@ -263,6 +266,44 @@ export const VideoDetail = () => {
       setVideo(updated);
     } catch (error) {
       console.error("Error updating status:", error);
+    }
+  };
+
+  const handleScoreJsonImport = async () => {
+    if (!video) return;
+    setParseError(null);
+    try {
+      const parsed = JSON.parse(scoreJsonInput);
+      const p = Number(parsed.pronunciation || 0);
+      const g = Number(parsed.grammar || 0);
+      const f = Number(parsed.fluency || 0);
+      const c = Number(parsed.clarity || 0);
+
+      const score: SpeakingScore = {
+        id: Math.random().toString(36).substring(2, 9),
+        video_id: video.video_id,
+        language: activeTab as any,
+        date: new Date().toISOString().split("T")[0],
+        script_version: activeScript?.version || 1,
+        pronunciation: p,
+        grammar: g,
+        fluency: f,
+        clarity: c,
+        total: Math.round((p + g + f + c) / 4),
+        main_problem: parsed.main_problem || "",
+        improvement_tip: parsed.improvement_tip || "",
+        comment: parsed.comment || "",
+        created_at: new Date().toISOString(),
+      };
+
+      await db.scores.add(score);
+      const scList = await db.scores.list(video.video_id);
+      setScores(scList);
+      setIsImportingScore(false);
+      setIsAddingScore(false);
+      setScoreJsonInput("");
+    } catch (e: any) {
+      setParseError(e.message);
     }
   };
 
@@ -918,15 +959,35 @@ Start analysis now.`;
       {isAddingScore && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-xl animate-in fade-in duration-300">
           <div className="bg-white rounded-[4rem] shadow-[0_0_100px_rgba(0,0,0,0.2)] w-full max-w-xl overflow-hidden animate-in slide-in-from-bottom-10 zoom-in-95 duration-500">
-            <div className="p-12 border-b border-slate-50 flex justify-between items-center">
-              <h3 className="text-3xl font-black text-slate-800 tracking-tighter italic">
-                採点記録 ({activeTab})
-              </h3>
+            <div className="p-8 sm:p-12 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
+              <div className="flex flex-col">
+                <h3 className="text-xl sm:text-3xl font-black text-slate-800 tracking-tighter italic">
+                  採点記録 ({activeTab})
+                </h3>
+                <div className="flex gap-2 mt-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsShowingScorePrompt(true)}
+                    className="flex items-center gap-2 px-4 py-1.5 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-black tracking-widest hover:bg-indigo-100 transition-all uppercase"
+                  >
+                    <Star className="w-3 h-3 fill-current" />
+                    AI PROMPT
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsImportingScore(true)}
+                    className="flex items-center gap-2 px-4 py-1.5 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black tracking-widest hover:bg-blue-100 transition-all uppercase"
+                  >
+                    <Bolt className="w-3 h-3 fill-current" />
+                    IMPORT
+                  </button>
+                </div>
+              </div>
               <button
                 onClick={() => setIsAddingScore(false)}
-                className="w-16 h-16 rounded-[2rem] bg-slate-50 text-slate-400 hover:bg-slate-100 hover:rotate-90 transition-all duration-500 flex items-center justify-center"
+                className="w-12 h-12 sm:w-16 sm:h-16 rounded-[1.5rem] sm:rounded-[2rem] bg-white text-slate-400 hover:bg-slate-50 hover:rotate-90 transition-all duration-500 flex items-center justify-center border border-slate-100"
               >
-                <X className="w-8 h-8" />
+                <X className="w-6 h-6 sm:w-8 h-8" />
               </button>
             </div>
             <form
@@ -1012,6 +1073,135 @@ Start analysis now.`;
                 SAVE PERFORMANCE SCORE
               </button>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Score Prompt Overlay */}
+      {isShowingScorePrompt && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-xl animate-in fade-in duration-300">
+          <div className="bg-white rounded-[2.5rem] sm:rounded-[4rem] shadow-[0_0_100px_rgba(0,0,0,0.2)] w-full max-w-2xl overflow-hidden animate-in slide-in-from-bottom-10 zoom-in-95 duration-500 flex flex-col max-h-[90vh]">
+            <div className="p-8 sm:p-12 border-b border-slate-50 flex justify-between items-center shrink-0">
+              <div>
+                <h3 className="text-xl sm:text-3xl font-black text-slate-800 tracking-tighter italic shrink-0">
+                  SCORE EVAL PROMPT
+                </h3>
+                <p className="text-[9px] text-slate-400 font-black uppercase mt-1 sm:mt-2 tracking-widest flex items-center gap-2">
+                  <Star className="w-3 h-3 text-indigo-500" />
+                  Performance Evaluation: {activeTab}
+                </p>
+              </div>
+              <button
+                onClick={() => setIsShowingScorePrompt(false)}
+                className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl sm:rounded-[2rem] bg-slate-50 text-slate-400 hover:bg-slate-100 transition-all flex items-center justify-center"
+              >
+                <X className="w-6 h-6 sm:w-8 h-8" />
+              </button>
+            </div>
+            <div className="p-8 sm:p-12 space-y-6 sm:space-y-8 overflow-y-auto">
+              <div className="bg-slate-50 p-6 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-slate-100 flex-1 overflow-y-auto">
+                <pre className="text-[11px] font-mono text-slate-600 whitespace-pre-wrap leading-relaxed">
+                  {`Please evaluate my speaking performance for the following script.
+Give me a score (0-100) for each category and provide a brief feedback.
+
+【Output Format】
+Output ONLY JSON. Do not include markdown code blocks.
+
+【JSON Structure】
+{
+  "pronunciation": 0-100,
+  "grammar": 0-100,
+  "fluency": 0-100,
+  "clarity": 0-100,
+  "main_problem": "(English explanation of the biggest issue)",
+  "improvement_tip": "(English one-line tip)",
+  "comment": "(English brief overall comment)"
+}
+
+【Script】
+${activeScript?.text || "No script provided"}
+
+Please provide the scores based on my actual performance (audio/text data provided separately).
+Start evaluation now.`}
+                </pre>
+              </div>
+              <button
+                onClick={() => {
+                  const prompt = `Please evaluate my speaking performance for the following script.
+Give me a score (0-100) for each category and provide a brief feedback.
+
+【Output Format】
+Output ONLY JSON. Do not include markdown code blocks.
+
+【JSON Structure】
+{
+  "pronunciation": 0-100,
+  "grammar": 0-100,
+  "fluency": 0-100,
+  "clarity": 0-100,
+  "main_problem": "(English explanation of the biggest issue)",
+  "improvement_tip": "(English one-line tip)",
+  "comment": "(English brief overall comment)"
+}
+
+【Script】
+${activeScript?.text || "No script provided"}
+
+Please provide the scores based on my actual performance (audio/text data provided separately).
+Start evaluation now.`;
+                  navigator.clipboard.writeText(prompt);
+                  alert("Copied to clipboard!");
+                }}
+                className="w-full py-8 bg-indigo-600 text-white font-black rounded-[2.5rem] shadow-2xl shadow-indigo-200 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all duration-300 text-base tracking-[0.3em] uppercase italic flex items-center justify-center gap-4"
+              >
+                <Copy className="w-6 h-6" />
+                COPY EVAL PROMPT
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Score JSON Import Overlay */}
+      {isImportingScore && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-xl animate-in fade-in duration-300">
+          <div className="bg-white rounded-[4rem] shadow-[0_0_100px_rgba(0,0,0,0.2)] w-full max-w-2xl overflow-hidden animate-in slide-in-from-bottom-10 zoom-in-95 duration-500">
+            <div className="p-12 border-b border-slate-50 flex justify-between items-center">
+              <div>
+                <h3 className="text-3xl font-black text-slate-800 tracking-tighter italic">
+                  SCORE JSON IMPORT
+                </h3>
+                <p className="text-[10px] text-slate-400 font-black uppercase mt-2 tracking-widest flex items-center gap-2">
+                  <Bolt className="w-3 h-3 text-blue-500" />
+                  Target: {activeTab}
+                </p>
+              </div>
+              <button
+                onClick={() => setIsImportingScore(false)}
+                className="w-16 h-16 rounded-[2rem] bg-slate-50 text-slate-400 hover:bg-slate-100 hover:rotate-90 transition-all duration-500 flex items-center justify-center"
+              >
+                <X className="w-8 h-8" />
+              </button>
+            </div>
+            <div className="p-12 space-y-8">
+              <textarea
+                className="w-full h-80 p-10 rounded-[3rem] border-2 border-slate-50 focus:border-blue-500/20 focus:ring-0 text-xs font-mono bg-slate-50/50 resize-none shadow-inner tracking-wider leading-relaxed outline-none transition-all"
+                value={scoreJsonInput}
+                onChange={(e) => setScoreJsonInput(e.target.value)}
+                placeholder="AIが生成したスコアJSONをここに貼り付け..."
+              />
+              {parseError && (
+                <div className="p-6 bg-red-50 text-red-600 text-xs font-black rounded-[2rem] flex items-center gap-4 animate-bounce">
+                  <TriangleAlert className="w-6 h-6" />
+                  {parseError}
+                </div>
+              )}
+              <button
+                onClick={handleScoreJsonImport}
+                className="w-full py-8 bg-blue-600 text-white font-black rounded-[2.5rem] shadow-2xl shadow-blue-200 hover:bg-blue-700 hover:scale-[1.02] active:scale-95 transition-all duration-300 text-base tracking-[0.3em] uppercase italic"
+              >
+                IMPORT PERFORMANCE SCORE
+              </button>
+            </div>
           </div>
         </div>
       )}
