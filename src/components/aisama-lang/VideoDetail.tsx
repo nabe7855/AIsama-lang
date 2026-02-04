@@ -491,13 +491,13 @@ export const VideoDetail = () => {
                         stroke="#4f46e5"
                         strokeWidth={4}
                         dot={{
-                          r: 6,
+                          r: 12,
                           fill: "#4f46e5",
-                          strokeWidth: 2,
+                          strokeWidth: 4,
                           stroke: "#fff",
                         }}
                         activeDot={{
-                          r: 8,
+                          r: 14,
                           fill: "#4f46e5",
                           strokeWidth: 4,
                           stroke: "#fff",
