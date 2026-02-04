@@ -394,348 +394,14 @@ export const VideoDetail = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
-        {/* Left Column: Script and Items */}
-        <div className="lg:col-span-8 space-y-8 lg:space-y-10">
-          {/* Script Editor */}
-          <div className="bg-white rounded-[2.5rem] md:rounded-[4rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col h-auto lg:h-[1000px] group">
-            <div className="flex bg-slate-50/50 p-2 sm:p-3 gap-2 border-b border-slate-100 overflow-x-auto scrollbar-hide">
-              {(["JP", "EN", "ZH", "ES"] as Language[]).map((lang) => (
-                <button
-                  key={lang}
-                  onClick={() => setActiveTab(lang)}
-                  className={cn(
-                    "min-w-[80px] sm:flex-1 py-3 sm:py-4 font-black text-[10px] sm:text-xs transition-all duration-300 rounded-[1rem] sm:rounded-[1.25rem]",
-                    activeTab === lang
-                      ? "bg-white text-blue-600 shadow-lg sm:shadow-xl shadow-slate-200/50 scale-[1.02]"
-                      : "text-slate-400 hover:text-slate-600 hover:bg-white/50",
-                  )}
-                >
-                  {lang}
-                </button>
-              ))}
-            </div>
-
-            <div className="p-6 md:p-12 flex-1 flex flex-col space-y-6 md:space-y-8">
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div className="flex items-center justify-between w-full sm:w-auto">
-                  <h3 className="font-black text-slate-800 text-xs sm:text-sm flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
-                      <FileText className="w-4 h-4" />
-                    </div>
-                    スクリプト編集
-                  </h3>
-                  <button
-                    onClick={() => setIsScriptCollapsed(!isScriptCollapsed)}
-                    className="lg:hidden w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-blue-50 hover:text-blue-600 transition-all"
-                  >
-                    <ChevronRight
-                      className={cn(
-                        "w-5 h-5 transition-transform duration-500",
-                        !isScriptCollapsed ? "rotate-90" : "rotate-0",
-                      )}
-                    />
-                  </button>
-                </div>
-                {(!isScriptCollapsed || activeTab === "EN") &&
-                activeTab !== "JP" ? (
-                  <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-3 w-full sm:w-auto">
-                    <button
-                      onClick={() => setIsShowingPrompt(true)}
-                      className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-slate-100 text-slate-600 rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] tracking-[0.1em] sm:tracking-[0.2em] hover:bg-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2 uppercase italic"
-                    >
-                      <Plus className="w-3 h-3" />
-                      PROMPT
-                    </button>
-                    <button
-                      onClick={handleDownloadCSV}
-                      className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-white border-2 border-slate-100 text-slate-500 rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] tracking-[0.1em] sm:tracking-[0.2em] hover:bg-slate-50 transition-all active:scale-95 flex items-center justify-center gap-2 uppercase italic"
-                    >
-                      <Download className="w-3 h-3" />
-                      CSV
-                    </button>
-                    <button
-                      onClick={() => setIsBulkImporting(true)}
-                      className="w-full sm:w-auto flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-indigo-600 text-white rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] tracking-[0.1em] sm:tracking-[0.2em] hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 active:scale-95 flex items-center justify-center gap-2 uppercase font-italic"
-                    >
-                      <Bolt className="w-3 h-3 fill-white" />
-                      IMPORT
-                    </button>
-                  </div>
-                ) : null}
-              </div>
-
-              <div
-                className={cn(
-                  "relative transition-all duration-500 ease-in-out overflow-hidden lg:flex-1 lg:flex lg:flex-col",
-                  isScriptCollapsed
-                    ? "max-h-0 lg:max-h-none opacity-0 lg:opacity-100 lg:mt-0"
-                    : "max-h-[1200px] opacity-100 mt-6",
-                )}
-              >
-                <div className="min-h-[300px] lg:flex-1 relative flex flex-col">
-                  <textarea
-                    className="w-full flex-1 p-5 sm:p-10 rounded-2xl sm:rounded-[3rem] border-2 border-slate-50 focus:border-blue-500/20 focus:bg-white focus:ring-0 focus:outline-none text-slate-700 font-medium leading-relaxed bg-slate-50/50 text-base sm:text-lg resize-none shadow-inner transition-all h-[800px] lg:h-full"
-                    placeholder={`${activeTab}で入力してください...`}
-                    value={activeScript?.text || ""}
-                    onChange={(e) => handleScriptChange(e.target.value)}
-                  />
-                  <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="px-4 py-2 bg-slate-900/80 backdrop-blur-md text-white rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-2 shadow-2xl">
-                      <Activity className="w-3 h-3 text-green-400" />
-                      Live Saving
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Training Items */}
-          <div className="bg-white rounded-[2.5rem] md:rounded-[4rem] border border-slate-100 shadow-sm overflow-hidden min-h-[400px]">
-            <div className="p-6 md:p-12 border-b border-slate-50 flex flex-col sm:flex-row justify-between items-center gap-4">
-              <h3 className="font-black text-slate-800 text-xs sm:text-sm flex items-center gap-4 w-full sm:w-auto">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center shrink-0">
-                  <Brain className="w-5 h-5 sm:w-6 sm:h-6" />
-                </div>
-                トレーニング ({activeTab})
-              </h3>
-              <div className="w-full sm:w-auto px-4 sm:px-5 py-2 sm:py-2.5 bg-slate-50 rounded-full text-[8px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center justify-center gap-2">
-                <Check className="w-3 h-3" />
-                INTEGRATED
-              </div>
-            </div>
-
-            {/* Type Filters */}
-            <div className="px-6 md:px-12 py-4 sm:py-6 bg-slate-50/30 border-b border-slate-50 flex flex-wrap gap-3 sm:gap-4 overflow-x-auto scrollbar-hide">
-              <div className="flex gap-2 sm:gap-4 pr-4 border-r border-slate-200 shrink-0">
-                <button
-                  onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-                  className={cn(
-                    "px-4 sm:px-5 py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2",
-                    showFavoritesOnly
-                      ? "bg-yellow-400 text-slate-900 shadow-lg shadow-yellow-100"
-                      : "bg-white text-slate-400 border border-slate-100 hover:text-yellow-600 hover:border-yellow-200",
-                  )}
-                >
-                  <Star
-                    className={cn(
-                      "w-3 h-3",
-                      showFavoritesOnly ? "fill-slate-900" : "",
-                    )}
-                  />
-                  FAVORITES
-                </button>
-              </div>
-
-              <div className="flex gap-2 sm:gap-4 items-center">
-                <button
-                  onClick={() => setActiveItemType("all")}
-                  className={cn(
-                    "px-6 py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all shrink-0",
-                    activeItemType === "all"
-                      ? "bg-slate-900 text-white shadow-lg"
-                      : "text-slate-400 hover:text-slate-600 hover:bg-white/50",
-                  )}
-                >
-                  ALL
-                </button>
-                {(["vocab", "grammar", "phrase", "mistake"] as ItemType[]).map(
-                  (type) => (
-                    <button
-                      key={type}
-                      onClick={() => setActiveItemType(type)}
-                      className={cn(
-                        "px-5 sm:px-6 py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shrink-0",
-                        activeItemType === type
-                          ? "bg-indigo-600 text-white shadow-lg"
-                          : "text-slate-400 hover:text-slate-600 hover:bg-white/50",
-                      )}
-                    >
-                      {type === "vocab" && <Tag className="w-3 h-3" />}
-                      {type === "grammar" && <FileText className="w-3 h-3" />}
-                      {type === "phrase" && <MapPin className="w-3 h-3" />}
-                      {type === "mistake" && (
-                        <TriangleAlert className="w-3 h-3" />
-                      )}
-                      {type === "vocab"
-                        ? "Vocab"
-                        : type === "grammar"
-                          ? "Grammar"
-                          : type === "phrase"
-                            ? "Phrases"
-                            : "Mistakes"}
-                    </button>
-                  ),
-                )}
-              </div>
-            </div>
-
-            <div className="p-6 md:p-12">
-              {activeTab === "JP" ? (
-                <div className="flex flex-col items-center justify-center py-16 sm:py-24 text-slate-300 border-4 border-dashed border-slate-50 rounded-[2rem] sm:rounded-[3rem]">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-50 rounded-[1.5rem] sm:rounded-[2rem] flex items-center justify-center mb-6">
-                    <ChevronRight className="w-8 h-8 sm:w-10 sm:h-10" />
-                  </div>
-                  <p className="font-bold italic text-xs sm:text-sm text-center max-w-[200px] sm:max-w-xs leading-relaxed">
-                    外国語タブを選択してアイテムを登録・管理してください
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-                  {learningItems
-                    .filter(
-                      (i) =>
-                        i.language === activeTab &&
-                        (activeItemType === "all" ||
-                          i.type === activeItemType) &&
-                        (!showFavoritesOnly || i.is_favorite),
-                    )
-                    .map((item) => (
-                      <div
-                        key={item.id}
-                        className="relative h-48 sm:h-80 perspective-1000 group"
-                        onClick={() => {
-                          const next = new Set(flippedIds);
-                          if (next.has(item.id)) next.delete(item.id);
-                          else next.add(item.id);
-                          setFlippedIds(next);
-                        }}
-                      >
-                        <div
-                          className={cn(
-                            "relative w-full h-full transition-all duration-700 preserve-3d cursor-pointer",
-                            flippedIds.has(item.id) ? "rotate-y-180" : "",
-                            !item.active && "opacity-40 grayscale-[50%]",
-                          )}
-                        >
-                          {/* Front Side */}
-                          <div className="absolute inset-0 backface-hidden bg-white border-2 border-slate-50 rounded-[1.5rem] sm:rounded-[3rem] p-5 sm:p-10 shadow-xl shadow-slate-200/50 flex flex-col items-center justify-center text-center">
-                            <div className="absolute top-5 left-5 right-5 flex justify-between items-start pointer-events-none">
-                              <div
-                                className={cn(
-                                  "w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0 pointer-events-auto",
-                                  item.type === "vocab"
-                                    ? "bg-orange-500"
-                                    : item.type === "grammar"
-                                      ? "bg-blue-500"
-                                      : item.type === "phrase"
-                                        ? "bg-purple-500"
-                                        : "bg-red-500",
-                                )}
-                              >
-                                {item.type === "vocab" ? (
-                                  <Tag className="w-5 h-5 sm:w-6 sm:h-6" />
-                                ) : item.type === "grammar" ? (
-                                  <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
-                                ) : item.type === "phrase" ? (
-                                  <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />
-                                ) : (
-                                  <TriangleAlert className="w-5 h-5 sm:w-6 sm:h-6" />
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2 sm:gap-3 pointer-events-auto">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleToggleFavorite(item.id);
-                                  }}
-                                  className={cn(
-                                    "w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all",
-                                    item.is_favorite
-                                      ? "bg-yellow-400 text-white shadow-lg shadow-yellow-200"
-                                      : "bg-slate-100 text-slate-300 hover:bg-yellow-50 hover:text-yellow-400",
-                                  )}
-                                >
-                                  <Star
-                                    className={cn(
-                                      "w-4 h-4 sm:w-5 sm:h-5",
-                                      item.is_favorite ? "fill-white" : "",
-                                    )}
-                                  />
-                                </button>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleToggleItem(item.id);
-                                  }}
-                                  className={cn(
-                                    "w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all",
-                                    item.active
-                                      ? "bg-blue-600 text-white"
-                                      : "bg-slate-100 text-slate-300",
-                                  )}
-                                >
-                                  <Check className="w-4 h-4 sm:w-5 sm:h-5 stroke-[3px]" />
-                                </button>
-                              </div>
-                            </div>
-                            <div className="w-full">
-                              <p className="text-lg sm:text-3xl font-black text-slate-800 tracking-tight italic uppercase break-words px-2">
-                                {item.head}
-                              </p>
-                              <p className="text-[7px] sm:text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mt-2 sm:mt-4">
-                                TAP TO REVEAL
-                              </p>
-                            </div>
-                          </div>
-
-                          {/* Back Side */}
-                          <div className="absolute inset-0 backface-hidden bg-slate-900 rounded-[1.5rem] sm:rounded-[3rem] p-5 sm:p-10 shadow-2xl rotate-y-180 flex flex-col items-center justify-center text-center overflow-hidden">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl -mr-16 -mt-16"></div>
-
-                            <div className="relative z-10 w-full space-y-4 sm:space-y-6">
-                              <div>
-                                <h4 className="text-[8px] sm:text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1 sm:mb-2">
-                                  Meaning
-                                </h4>
-                                <p className="text-white text-base sm:text-xl font-black italic break-words px-2">
-                                  {item.tail}
-                                </p>
-                              </div>
-
-                              {item.usage && (
-                                <div className="overflow-hidden">
-                                  <h4 className="text-[8px] sm:text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1 sm:mb-2">
-                                    Usage
-                                  </h4>
-                                  <p className="text-slate-400 text-[8px] sm:text-[10px] font-bold leading-relaxed bg-white/5 p-3 sm:p-4 rounded-xl sm:rounded-2xl break-words line-clamp-3">
-                                    {item.usage}
-                                  </p>
-                                </div>
-                              )}
-                            </div>
-
-                            <p className="relative z-10 text-[7px] sm:text-[9px] font-black text-slate-600 uppercase tracking-widest text-right italic">
-                              AIsama-lang OS
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  {learningItems.filter(
-                    (i) =>
-                      i.language === activeTab &&
-                      (activeItemType === "all" || i.type === activeItemType),
-                  ).length === 0 && (
-                    <div className="col-span-full py-20 text-center text-slate-200 font-bold border-4 border-dashed border-slate-50 rounded-[3rem] italic flex flex-col items-center gap-4">
-                      <Plus className="w-12 h-12 mb-2" />
-                      アイテム未登録
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column: Scoring */}
-        <div className="lg:col-span-4 space-y-8 lg:space-y-10">
-          <div className="bg-white rounded-[2.5rem] md:rounded-[4rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col min-h-auto lg:h-[700px]">
+      <div className="flex flex-col gap-8 lg:gap-10">
+        {/* Top: Scoring Log (Now horizontal) */}
+        <div className="w-full">
+          <div className="bg-white rounded-[2.5rem] md:rounded-[4rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col">
             <div className="p-6 md:p-12 border-b border-slate-50 flex justify-between items-center">
               <h3 className="font-black text-slate-800 text-xs sm:text-sm flex items-center gap-3">
                 <History className="w-5 h-5 text-blue-500 shrink-0" />
-                採点ログ
+                採点ログ ({activeTab})
               </h3>
               <button
                 onClick={() => setIsAddingScore(true)}
@@ -745,9 +411,9 @@ export const VideoDetail = () => {
               </button>
             </div>
 
-            <div className="p-6 md:p-8 space-y-6 overflow-y-auto scrollbar-hide flex-1 flex flex-col min-h-[400px]">
+            <div className="p-6 md:p-8 flex flex-col min-h-[300px] sm:min-h-[400px]">
               {scores.filter((s) => s.language === activeTab).length > 0 ? (
-                <div className="flex-1 w-full min-h-[300px] mt-4">
+                <div className="flex-1 w-full min-h-[200px] sm:min-h-[300px] mt-4">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart
                       data={scores
@@ -757,7 +423,7 @@ export const VideoDetail = () => {
                             new Date(a.date).getTime() -
                             new Date(b.date).getTime(),
                         )}
-                      margin={{ top: 20, right: 20, left: -20, bottom: 0 }}
+                      margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
                       onClick={(data: any) => {
                         if (data && data.activePayload) {
                           setSelectedScore(data.activePayload[0].payload);
@@ -835,13 +501,304 @@ export const VideoDetail = () => {
                   </p>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-32 text-slate-200 border-4 border-dashed border-slate-50 rounded-[3rem] flex-1">
+                <div className="flex flex-col items-center justify-center py-20 text-slate-200 border-4 border-dashed border-slate-50 rounded-[3rem] flex-1">
                   <Activity className="w-16 h-16 mb-4 opacity-10" />
                   <p className="font-black text-xs uppercase tracking-[0.2em]">
                     No records for {activeTab}
                   </p>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+          {/* Left Column: Script Editor */}
+          <div className="lg:col-span-12 xl:col-span-8">
+            <div className="bg-white rounded-[2.5rem] md:rounded-[4rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col h-auto lg:h-[800px] group">
+              <div className="flex bg-slate-50/50 p-2 sm:p-3 gap-2 border-b border-slate-100 overflow-x-auto scrollbar-hide">
+                {(["JP", "EN", "ZH", "ES"] as Language[]).map((lang) => (
+                  <button
+                    key={lang}
+                    onClick={() => setActiveTab(lang)}
+                    className={cn(
+                      "min-w-[80px] sm:flex-1 py-3 sm:py-4 font-black text-[10px] sm:text-xs transition-all duration-300 rounded-[1rem] sm:rounded-[1.25rem]",
+                      activeTab === lang
+                        ? "bg-white text-blue-600 shadow-lg sm:shadow-xl shadow-slate-200/50 scale-[1.02]"
+                        : "text-slate-400 hover:text-slate-600 hover:bg-white/50",
+                    )}
+                  >
+                    {lang}
+                  </button>
+                ))}
+              </div>
+
+              <div className="p-6 md:p-12 flex-1 flex flex-col space-y-6 md:space-y-8">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                  <div className="flex items-center justify-between w-full sm:w-auto">
+                    <h3 className="font-black text-slate-800 text-xs sm:text-sm flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
+                        <FileText className="w-4 h-4" />
+                      </div>
+                      スクリプト編集
+                    </h3>
+                    <button
+                      onClick={() => setIsScriptCollapsed(!isScriptCollapsed)}
+                      className="lg:hidden w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-blue-50 hover:text-blue-600 transition-all"
+                    >
+                      <ChevronRight
+                        className={cn(
+                          "w-5 h-5 transition-transform duration-500",
+                          !isScriptCollapsed ? "rotate-90" : "rotate-0",
+                        )}
+                      />
+                    </button>
+                  </div>
+                  {(!isScriptCollapsed || activeTab === "EN") &&
+                  activeTab !== "JP" ? (
+                    <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-3 w-full sm:w-auto">
+                      <button
+                        onClick={() => setIsShowingPrompt(true)}
+                        className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-slate-100 text-slate-600 rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] tracking-[0.1em] sm:tracking-[0.2em] hover:bg-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2 uppercase italic"
+                      >
+                        <Plus className="w-3 h-3" />
+                        PROMPT
+                      </button>
+                      <button
+                        onClick={handleDownloadCSV}
+                        className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-white border-2 border-slate-100 text-slate-500 rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] tracking-[0.1em] sm:tracking-[0.2em] hover:bg-slate-50 transition-all active:scale-95 flex items-center justify-center gap-2 uppercase italic"
+                      >
+                        <Download className="w-3 h-3" />
+                        CSV
+                      </button>
+                      <button
+                        onClick={() => setIsBulkImporting(true)}
+                        className="w-full sm:w-auto flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-indigo-600 text-white rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] tracking-[0.1em] sm:tracking-[0.2em] hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 active:scale-95 flex items-center justify-center gap-2 uppercase font-italic"
+                      >
+                        <Bolt className="w-3 h-3 fill-white" />
+                        IMPORT
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
+
+                <div
+                  className={cn(
+                    "relative transition-all duration-500 ease-in-out overflow-hidden lg:flex-1 lg:flex lg:flex-col",
+                    isScriptCollapsed
+                      ? "max-h-0 lg:max-h-none opacity-0 lg:opacity-100 lg:mt-0"
+                      : "max-h-[1200px] opacity-100 mt-6",
+                  )}
+                >
+                  <div className="min-h-[300px] lg:flex-1 relative flex flex-col">
+                    <textarea
+                      className="w-full flex-1 p-5 sm:p-10 rounded-2xl sm:rounded-[3rem] border-2 border-slate-50 focus:border-blue-500/20 focus:bg-white focus:ring-0 focus:outline-none text-slate-700 font-medium leading-relaxed bg-slate-50/50 text-base sm:text-lg resize-none shadow-inner transition-all h-[500px] lg:h-full"
+                      placeholder={`${activeTab}で入力してください...`}
+                      value={activeScript?.text || ""}
+                      onChange={(e) => handleScriptChange(e.target.value)}
+                    />
+                    <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="px-4 py-2 bg-slate-900/80 backdrop-blur-md text-white rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-2 shadow-2xl">
+                        <Activity className="w-3 h-3 text-green-400" />
+                        Live Saving
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Training Items */}
+          <div className="lg:col-span-12 xl:col-span-4">
+            <div className="bg-white rounded-[2.5rem] md:rounded-[4rem] border border-slate-100 shadow-sm overflow-hidden min-h-[400px] lg:h-[800px] flex flex-col">
+              <div className="p-6 md:p-12 border-b border-slate-50 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <h3 className="font-black text-slate-800 text-xs sm:text-sm flex items-center gap-4 w-full sm:w-auto">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center shrink-0">
+                    <Brain className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </div>
+                  アイテム
+                </h3>
+                <div className="w-full sm:w-auto px-4 sm:px-5 py-2 sm:py-2.5 bg-slate-50 rounded-full text-[8px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center justify-center gap-2">
+                  <Check className="w-3 h-3" />
+                  {activeTab}
+                </div>
+              </div>
+
+              {/* Type Filters */}
+              <div className="px-6 md:px-10 py-4 sm:py-6 bg-slate-50/30 border-b border-slate-50 flex flex-wrap gap-2 overflow-x-auto scrollbar-hide shrink-0">
+                <button
+                  onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                  className={cn(
+                    "px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all flex items-center gap-2",
+                    showFavoritesOnly
+                      ? "bg-yellow-400 text-slate-900 shadow-lg shadow-yellow-100"
+                      : "bg-white text-slate-400 border border-slate-100",
+                  )}
+                >
+                  <Star
+                    className={cn(
+                      "w-3 h-3",
+                      showFavoritesOnly ? "fill-slate-900" : "",
+                    )}
+                  />
+                </button>
+                <div className="w-px h-4 bg-slate-200 mx-1"></div>
+                <button
+                  onClick={() => setActiveItemType("all")}
+                  className={cn(
+                    "px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all",
+                    activeItemType === "all"
+                      ? "bg-slate-900 text-white shadow-lg"
+                      : "text-slate-400 hover:text-slate-600",
+                  )}
+                >
+                  ALL
+                </button>
+                {(["vocab", "grammar", "phrase", "mistake"] as ItemType[]).map(
+                  (type) => (
+                    <button
+                      key={type}
+                      onClick={() => setActiveItemType(type)}
+                      className={cn(
+                        "px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5",
+                        activeItemType === type
+                          ? "bg-indigo-600 text-white shadow-lg"
+                          : "text-slate-400 hover:text-slate-600",
+                      )}
+                    >
+                      {type === "vocab"
+                        ? "V"
+                        : type === "grammar"
+                          ? "G"
+                          : type === "phrase"
+                            ? "P"
+                            : "M"}
+                    </button>
+                  ),
+                )}
+              </div>
+
+              <div className="p-6 md:p-8 overflow-y-auto flex-1 scrollbar-hide">
+                {activeTab === "JP" ? (
+                  <div className="flex flex-col items-center justify-center py-16 text-slate-200 border-4 border-dashed border-slate-50 rounded-[3rem]">
+                    <Activity className="w-12 h-12 mb-4 opacity-10" />
+                    <p className="font-black text-[10px] uppercase tracking-[0.2em] text-center px-6">
+                      Select target lang tab
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {learningItems
+                      .filter(
+                        (i) =>
+                          i.language === activeTab &&
+                          (activeItemType === "all" ||
+                            i.type === activeItemType) &&
+                          (!showFavoritesOnly || i.is_favorite),
+                      )
+                      .map((item) => (
+                        <div
+                          key={item.id}
+                          className="relative h-40 perspective-1000 group"
+                          onClick={() => {
+                            const next = new Set(flippedIds);
+                            if (next.has(item.id)) next.delete(item.id);
+                            else next.add(item.id);
+                            setFlippedIds(next);
+                          }}
+                        >
+                          <div
+                            className={cn(
+                              "relative w-full h-full transition-all duration-700 preserve-3d cursor-pointer",
+                              flippedIds.has(item.id) ? "rotate-y-180" : "",
+                              !item.active && "opacity-40 grayscale-[50%]",
+                            )}
+                          >
+                            {/* Front Side */}
+                            <div className="absolute inset-0 backface-hidden bg-white border-2 border-slate-50 rounded-[2rem] p-6 shadow-sm flex flex-col items-center justify-center text-center">
+                              <div className="absolute top-4 left-4 right-4 flex justify-between items-center pointer-events-none">
+                                <div
+                                  className={cn(
+                                    "w-6 h-6 rounded-md flex items-center justify-center text-white text-[8px] font-black",
+                                    item.type === "vocab"
+                                      ? "bg-orange-500"
+                                      : item.type === "grammar"
+                                        ? "bg-blue-500"
+                                        : item.type === "phrase"
+                                          ? "bg-purple-500"
+                                          : "bg-red-500",
+                                  )}
+                                >
+                                  {item.type.charAt(0).toUpperCase()}
+                                </div>
+                                <div className="flex items-center gap-1.5 pointer-events-auto">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleToggleFavorite(item.id);
+                                    }}
+                                    className={cn(
+                                      "w-7 h-7 rounded-lg flex items-center justify-center transition-all",
+                                      item.is_favorite
+                                        ? "bg-yellow-400 text-white shadow-lg shadow-yellow-100"
+                                        : "bg-slate-50 text-slate-200 hover:text-yellow-400",
+                                    )}
+                                  >
+                                    <Star
+                                      className={cn(
+                                        "w-3.5 h-3.5",
+                                        item.is_favorite ? "fill-white" : "",
+                                      )}
+                                    />
+                                  </button>
+                                </div>
+                              </div>
+                              <p className="text-xl font-black text-slate-800 tracking-tight italic uppercase break-words px-2 mt-4">
+                                {item.head}
+                              </p>
+                              <p className="text-[7px] font-black text-slate-300 uppercase tracking-[0.2em] mt-3">
+                                REVEAL
+                              </p>
+                            </div>
+
+                            {/* Back Side */}
+                            <div className="absolute inset-0 backface-hidden bg-slate-900 rounded-[2rem] p-6 shadow-2xl rotate-y-180 flex flex-col items-center justify-center text-center overflow-hidden">
+                              <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 blur-2xl -mr-12 -mt-12"></div>
+                              <div className="relative z-10 w-full">
+                                <h4 className="text-[7px] font-black text-indigo-400 uppercase tracking-widest mb-1.5">
+                                  Meaning
+                                </h4>
+                                <p className="text-white text-sm font-black italic break-words px-2">
+                                  {item.tail}
+                                </p>
+                                {item.usage && (
+                                  <div className="mt-3">
+                                    <p className="text-slate-400 text-[8px] font-bold leading-relaxed line-clamp-2">
+                                      {item.usage}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    {learningItems.filter(
+                      (i) =>
+                        i.language === activeTab &&
+                        (activeItemType === "all" || i.type === activeItemType),
+                    ).length === 0 && (
+                      <div className="py-12 text-center text-slate-200 font-bold border-2 border-dashed border-slate-50 rounded-[2rem] italic flex flex-col items-center gap-2">
+                        <Plus className="w-8 h-8 opacity-20" />
+                        <p className="text-[9px] uppercase tracking-widest">
+                          No Items
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
