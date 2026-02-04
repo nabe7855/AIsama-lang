@@ -413,7 +413,10 @@ export const VideoDetail = () => {
 
             <div className="p-6 md:p-8 flex flex-col min-h-[300px] sm:min-h-[400px]">
               {scores.filter((s) => s.language === activeTab).length > 0 ? (
-                <div className="w-full min-w-0 h-[300px] mt-4 cursor-pointer relative z-10">
+                <div
+                  className="w-full min-w-0 h-[300px] mt-4 cursor-pointer relative z-10"
+                  onClick={() => console.log("Container clicked")}
+                >
                   <ResponsiveContainer
                     width="100%"
                     height="100%"
@@ -431,8 +434,10 @@ export const VideoDetail = () => {
                         )}
                       margin={{ top: 20, right: 30, left: 20, bottom: 0 }}
                       onClick={(data: any) => {
+                        console.log("LineChart clicked", data);
                         if (data && data.activePayload) {
                           const date = data.activePayload[0].payload.date;
+                          console.log("Chart payload date:", date);
                           const matches = scores
                             .filter(
                               (s) =>
@@ -443,7 +448,10 @@ export const VideoDetail = () => {
                                 new Date(b.created_at).getTime() -
                                 new Date(a.created_at).getTime(),
                             );
+                          console.log("Matches found:", matches.length);
                           setSelectedScores(matches);
+                        } else {
+                          console.log("No activePayload in chart click");
                         }
                       }}
                     >
@@ -508,6 +516,7 @@ export const VideoDetail = () => {
                           strokeWidth: 4,
                           stroke: "#fff",
                           onClick: (e, payload: any) => {
+                            console.log("ActiveDot clicked", payload);
                             const date = payload.payload.date;
                             const matches = scores
                               .filter(
