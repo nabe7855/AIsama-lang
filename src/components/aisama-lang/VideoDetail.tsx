@@ -79,9 +79,7 @@ export const VideoDetail = () => {
   const [isImportingScore, setIsImportingScore] = useState(false);
   const [isShowingScorePrompt, setIsShowingScorePrompt] = useState(false);
   const [scoreJsonInput, setScoreJsonInput] = useState("");
-  const [selectedScore, setSelectedScore] = useState<SpeakingScore | null>(
-    null,
-  );
+  const [selectedScores, setSelectedScores] = useState<SpeakingScore[]>([]);
 
   useEffect(() => {
     const init = async () => {
@@ -428,7 +426,18 @@ export const VideoDetail = () => {
                       margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
                       onClick={(data: any) => {
                         if (data && data.activePayload) {
-                          setSelectedScore(data.activePayload[0].payload);
+                          const date = data.activePayload[0].payload.date;
+                          const matches = scores
+                            .filter(
+                              (s) =>
+                                s.language === activeTab && s.date === date,
+                            )
+                            .sort(
+                              (a, b) =>
+                                new Date(b.created_at).getTime() -
+                                new Date(a.created_at).getTime(),
+                            );
+                          setSelectedScores(matches);
                         }
                       }}
                     >
@@ -492,8 +501,20 @@ export const VideoDetail = () => {
                           fill: "#4f46e5",
                           strokeWidth: 4,
                           stroke: "#fff",
-                          onClick: (e, payload: any) =>
-                            setSelectedScore(payload.payload),
+                          onClick: (e, payload: any) => {
+                            const date = payload.payload.date;
+                            const matches = scores
+                              .filter(
+                                (s) =>
+                                  s.language === activeTab && s.date === date,
+                              )
+                              .sort(
+                                (a, b) =>
+                                  new Date(b.created_at).getTime() -
+                                  new Date(a.created_at).getTime(),
+                              );
+                            setSelectedScores(matches);
+                          },
                         }}
                       />
                     </LineChart>
@@ -1204,97 +1225,210 @@ Start evaluation now.`;
           </div>
         </div>
       )}
-      {/* Score Detail Overlay */}
-      {selectedScore && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 sm:p-6 bg-slate-900/80 backdrop-blur-2xl animate-in fade-in duration-300">
-          <div className="bg-white rounded-[2.5rem] sm:rounded-[4rem] shadow-2xl w-full max-w-2xl overflow-hidden animate-in slide-in-from-bottom-10 zoom-in-95 duration-500">
-            <div className="p-8 sm:p-12 border-b border-slate-50 flex justify-between items-center bg-slate-900 text-white relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 blur-[80px] -mr-32 -mt-32"></div>
-              <div className="relative z-10">
-                <p className="text-[10px] font-black text-blue-400 uppercase tracking-[0.3em] mb-2">
-                  {selectedScore.date} / PERFORMANCE
-                </p>
-                <h3 className="text-4xl sm:text-6xl font-black italic tracking-tighter leading-none">
-                  {selectedScore.total}
-                  <span className="text-xl sm:text-2xl text-slate-500 not-italic ml-2 uppercase font-black">
-                    pts
-                  </span>
-                </h3>
-              </div>
-              <button
-                onClick={() => setSelectedScore(null)}
-                className="relative z-10 w-12 h-12 sm:w-16 sm:h-16 rounded-[1.5rem] sm:rounded-[2rem] bg-white/10 text-white/40 hover:text-white hover:bg-white/20 transition-all flex items-center justify-center"
-              >
-                <X className="w-6 h-6 sm:w-8 h-8" />
-              </button>
-            </div>
-            <div className="p-8 sm:p-12 space-y-8 sm:space-y-10 overflow-y-auto max-h-[60vh] scrollbar-hide">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                {[
-                  { label: "PRON", val: selectedScore.pronunciation },
-                  { label: "GRAM", val: selectedScore.grammar },
-                  { label: "FLUEN", val: selectedScore.fluency },
-                  { label: "CLAR", val: selectedScore.clarity },
-                ].map((s) => (
-                  <div
-                    key={s.label}
-                    className="text-center p-4 bg-slate-50 rounded-3xl border border-slate-100"
+      {/* Score Modal */}
+      <ScoreDetailModal
+        scores={selectedScores}
+        onClose={() => setSelectedScores([])}
+      />
+    </div>
+  );
+};
+
+const ScoreDetailModal = ({
+  scores,
+  onClose,
+}: {
+  scores: SpeakingScore[];
+  onClose: () => void;
+}) => {
+  const [viewingScore, setViewingScore] = useState<SpeakingScore | null>(null);
+
+  // If only one score, show it immediately. If multiple, show list.
+  // We use useEffect to set viewingScore if only 1 exists ONLY when opening.
+  // Actually, simpler: render logic based on state.
+
+  useEffect(() => {
+    if (scores.length === 1) {
+      setViewingScore(scores[0]);
+    } else {
+      setViewingScore(null); // Reset when scores change (e.g. closing or new selection)
+    }
+  }, [scores]);
+
+  if (scores.length === 0) return null;
+
+  // Single Detail View (either only 1 score exists OR user selected one from list)
+  if (viewingScore) {
+    return (
+      <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 sm:p-6 bg-slate-900/80 backdrop-blur-2xl animate-in fade-in duration-300">
+        <div className="bg-white rounded-[2.5rem] sm:rounded-[4rem] shadow-2xl w-full max-w-2xl overflow-hidden animate-in slide-in-from-bottom-10 zoom-in-95 duration-500">
+          <div className="p-8 sm:p-12 border-b border-slate-50 flex justify-between items-center bg-slate-900 text-white relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 blur-[80px] -mr-32 -mt-32"></div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-2">
+                {scores.length > 0 && (
+                  <button
+                    onClick={() =>
+                      scores.length === 1 ? onClose() : setViewingScore(null)
+                    }
+                    className="flex items-center gap-1 text-[9px] font-black text-blue-400 uppercase tracking-[0.2em] hover:text-white transition-colors"
                   >
-                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">
-                      {s.label}
-                    </p>
-                    <p className="text-xl font-black text-slate-800 italic">
-                      {s.val}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="space-y-6">
-                <div>
-                  <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
-                    <TriangleAlert className="w-4 h-4 text-orange-500" />
-                    Main Problem
-                  </h4>
-                  <p className="text-sm font-bold text-slate-600 leading-relaxed bg-orange-50/30 p-6 rounded-3xl border border-orange-100/50 italic">
-                    {selectedScore.main_problem}
-                  </p>
-                </div>
-
-                <div>
-                  <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
-                    <Bolt className="w-4 h-4 text-blue-500" />
-                    Improvement Tip
-                  </h4>
-                  <p className="text-sm font-black text-blue-600 leading-relaxed bg-blue-50/30 p-6 rounded-3xl border border-blue-100/50 italic">
-                    {selectedScore.improvement_tip}
-                  </p>
-                </div>
-
-                {selectedScore.comment && (
-                  <div>
-                    <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
-                      <History className="w-4 h-4 text-slate-400" />
-                      AI Comment
-                    </h4>
-                    <p className="text-xs font-medium text-slate-500 leading-relaxed">
-                      {selectedScore.comment}
-                    </p>
-                  </div>
+                    {scores.length > 1 && (
+                      <ChevronRight className="w-3 h-3 rotate-180" />
+                    )}
+                    {viewingScore.date} / PERFORMANCE
+                  </button>
                 )}
               </div>
+              <h3 className="text-4xl sm:text-6xl font-black italic tracking-tighter leading-none">
+                {viewingScore.total}
+                <span className="text-xl sm:text-2xl text-slate-500 not-italic ml-2 uppercase font-black">
+                  pts
+                </span>
+              </h3>
             </div>
-            <div className="p-8 sm:p-12 bg-slate-50/50 border-t border-slate-50">
-              <button
-                onClick={() => setSelectedScore(null)}
-                className="w-full py-6 bg-slate-900 text-white font-black rounded-3xl shadow-xl shadow-slate-200 hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-widest italic"
-              >
-                CLOSE REPORT
-              </button>
+            <button
+              onClick={onClose}
+              className="relative z-10 w-12 h-12 sm:w-16 sm:h-16 rounded-[1.5rem] sm:rounded-[2rem] bg-white/10 text-white/40 hover:text-white hover:bg-white/20 transition-all flex items-center justify-center"
+            >
+              <X className="w-6 h-6 sm:w-8 h-8" />
+            </button>
+          </div>
+          <div className="p-8 sm:p-12 space-y-8 sm:space-y-10 overflow-y-auto max-h-[60vh] scrollbar-hide">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {[
+                { label: "PRON", val: viewingScore.pronunciation },
+                { label: "GRAM", val: viewingScore.grammar },
+                { label: "FLUEN", val: viewingScore.fluency },
+                { label: "CLAR", val: viewingScore.clarity },
+              ].map((s) => (
+                <div
+                  key={s.label}
+                  className="text-center p-4 bg-slate-50 rounded-3xl border border-slate-100"
+                >
+                  <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                    {s.label}
+                  </p>
+                  <p className="text-xl font-black text-slate-800 italic">
+                    {s.val}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                  <TriangleAlert className="w-4 h-4 text-orange-500" />
+                  Main Problem
+                </h4>
+                <p className="text-sm font-bold text-slate-600 leading-relaxed bg-orange-50/30 p-6 rounded-3xl border border-orange-100/50 italic">
+                  {viewingScore.main_problem}
+                </p>
+              </div>
+
+              <div>
+                <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                  <Bolt className="w-4 h-4 text-blue-500" />
+                  Improvement Tip
+                </h4>
+                <p className="text-sm font-black text-blue-600 leading-relaxed bg-blue-50/30 p-6 rounded-3xl border border-blue-100/50 italic">
+                  {viewingScore.improvement_tip}
+                </p>
+              </div>
+
+              {viewingScore.comment && (
+                <div>
+                  <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                    <History className="w-4 h-4 text-slate-400" />
+                    AI Comment
+                  </h4>
+                  <p className="text-xs font-medium text-slate-500 leading-relaxed">
+                    {viewingScore.comment}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
+          <div className="p-8 sm:p-12 bg-slate-50/50 border-t border-slate-50">
+            <button
+              onClick={() => {
+                if (scores.length > 1) {
+                  setViewingScore(null);
+                } else {
+                  onClose();
+                }
+              }}
+              className="w-full py-6 bg-slate-900 text-white font-black rounded-3xl shadow-xl shadow-slate-200 hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-widest italic"
+            >
+              {scores.length > 1 ? "BACK TO LIST" : "CLOSE REPORT"}
+            </button>
+          </div>
         </div>
-      )}
+      </div>
+    );
+  }
+
+  // Multiple Scores List View
+  return (
+    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 sm:p-6 bg-slate-900/80 backdrop-blur-2xl animate-in fade-in duration-300">
+      <div className="bg-white rounded-[2.5rem] sm:rounded-[4rem] shadow-2xl w-full max-w-xl overflow-hidden animate-in slide-in-from-bottom-10 zoom-in-95 duration-500">
+        <div className="p-8 sm:p-10 border-b border-slate-50 flex justify-between items-center bg-slate-900 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 blur-[80px] -mr-32 -mt-32"></div>
+          <div className="relative z-10">
+            <p className="text-[10px] font-black text-blue-400 uppercase tracking-[0.3em] mb-2">
+              {scores[0]?.date}
+            </p>
+            <h3 className="text-2xl sm:text-3xl font-black italic tracking-tighter">
+              HISTORY LIST
+            </h3>
+          </div>
+          <button
+            onClick={onClose}
+            className="relative z-10 w-12 h-12 rounded-2xl bg-white/10 text-white/40 hover:text-white hover:bg-white/20 transition-all flex items-center justify-center"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+        <div className="p-6 sm:p-8 space-y-4 overflow-y-auto max-h-[60vh]">
+          {scores.map((s, i) => (
+            <button
+              key={s.id}
+              onClick={() => setViewingScore(s)}
+              className="w-full group text-left"
+            >
+              <div className="bg-slate-50 rounded-[2rem] p-6 border-2 border-slate-100 hover:border-blue-500 hover:bg-white hover:shadow-xl hover:shadow-blue-100/50 transition-all duration-300 relative overflow-hidden">
+                <div className="flex justify-between items-center relative z-10">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="px-3 py-1 bg-slate-200 text-slate-500 rounded-full text-[9px] font-black tracking-widest">
+                        {new Date(s.created_at).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                      {i === 0 && (
+                        <span className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-[9px] font-black tracking-widest">
+                          LATEST
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="text-3xl font-black italic text-slate-800 group-hover:text-blue-600 transition-colors">
+                        {s.total}
+                        <span className="text-xs text-slate-400 ml-1">pts</span>
+                      </span>
+                    </div>
+                  </div>
+                  <div className="w-12 h-12 rounded-full bg-white border-2 border-slate-100 flex items-center justify-center group-hover:bg-blue-600 group-hover:border-blue-600 transition-all">
+                    <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-white" />
+                  </div>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
