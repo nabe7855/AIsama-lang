@@ -1,5 +1,4 @@
 import { AuthProvider } from "@/components/aisama-lang/AuthContext";
-import { LanguageProvider } from "@/components/aisama-lang/LanguageContext";
 import { Metadata } from "next";
 import React from "react";
 
@@ -13,9 +12,5 @@ export default function AIsamaLangLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <AuthProvider>
-      <LanguageProvider>{children}</LanguageProvider>
-    </AuthProvider>
-  );
+  return <AuthProvider>{children}</AuthProvider>;
 }

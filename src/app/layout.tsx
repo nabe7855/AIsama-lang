@@ -1,6 +1,7 @@
 "use client";
 
 import { AuthProvider } from "@/components/aisama-lang/AuthContext";
+import { LanguageProvider } from "@/components/aisama-lang/LanguageContext";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -31,7 +32,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <LanguageProvider>{children}</LanguageProvider>
+        </AuthProvider>
       </body>
     </html>
   );
