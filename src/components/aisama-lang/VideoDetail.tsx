@@ -1009,7 +1009,8 @@ Start analysis now.`;
               <div className="bg-slate-50 p-6 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-slate-100 flex-1 overflow-y-auto">
                 <pre className="text-[11px] font-mono text-slate-600 whitespace-pre-wrap leading-relaxed">
                   {`Please evaluate my speaking performance for the following script.
-Give me a score (0-100) for each category and provide a brief feedback.
+Give me a STRICT score (0-100) for each category. Be very critical and strict with the scoring.
+Provide a detailed report and specific advice for improvement.
 
 【Output Format】
 Output ONLY JSON. Do not include markdown code blocks.
@@ -1020,9 +1021,9 @@ Output ONLY JSON. Do not include markdown code blocks.
   "grammar": 0-100,
   "fluency": 0-100,
   "clarity": 0-100,
-  "main_problem": "(English explanation of the biggest issue)",
-  "improvement_tip": "(English one-line tip)",
-  "comment": "(English brief overall comment)"
+  "main_problem": "(Detailed English explanation of the biggest issue and why it matters)",
+  "improvement_tip": "(Detailed and actionable English advice on how to improve)",
+  "comment": "(Detailed English feedback on overall performance, including specific strengths and weaknesses)"
 }
 
 【Script】
@@ -1035,7 +1036,8 @@ Start evaluation now.`}
               <button
                 onClick={() => {
                   const prompt = `Please evaluate my speaking performance for the following script.
-Give me a score (0-100) for each category and provide a brief feedback.
+Give me a STRICT score (0-100) for each category. Be very critical and strict with the scoring.
+Provide a detailed report and specific advice for improvement.
 
 【Output Format】
 Output ONLY JSON. Do not include markdown code blocks.
@@ -1046,9 +1048,9 @@ Output ONLY JSON. Do not include markdown code blocks.
   "grammar": 0-100,
   "fluency": 0-100,
   "clarity": 0-100,
-  "main_problem": "(English explanation of the biggest issue)",
-  "improvement_tip": "(English one-line tip)",
-  "comment": "(English brief overall comment)"
+  "main_problem": "(Detailed English explanation of the biggest issue and why it matters)",
+  "improvement_tip": "(Detailed and actionable English advice on how to improve)",
+  "comment": "(Detailed English feedback on overall performance, including specific strengths and weaknesses)"
 }
 
 【Script】
