@@ -1,5 +1,6 @@
 "use client";
 
+import { Language } from "@/types/aisama-lang";
 import { clsx, type ClassValue } from "clsx";
 import {
   Bolt,
@@ -15,6 +16,7 @@ import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 import { twMerge } from "tailwind-merge";
 import { useAuth } from "./AuthContext";
+import { useLanguage } from "./LanguageContext";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -26,6 +28,9 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { selectedLang, setSelectedLang } = useLanguage();
+
+  const languages: Language[] = ["JP", "EN", "ZH", "ES"];
 
   const isActive = (path: string) => {
     if (path === "/aisama-lang" && pathname === "/aisama-lang") return true;
@@ -103,27 +108,69 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
               ログアウト
             </button>
           </div>
+
+          {/* Language Switcher */}
+          <div className="px-4 pb-6">
+            <div className="bg-slate-800 rounded-2xl p-4">
+              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3 px-1">
+                Language
+              </p>
+              <div className="grid grid-cols-4 gap-2">
+                {languages.map((lang) => (
+                  <button
+                    key={lang}
+                    onClick={() => setSelectedLang(lang)}
+                    className={cn(
+                      "py-2 rounded-xl text-[10px] font-black transition-all",
+                      selectedLang === lang
+                        ? "bg-blue-600 text-white shadow-lg"
+                        : "bg-slate-700 text-slate-400 hover:bg-slate-600 hover:text-white",
+                    )}
+                  >
+                    {lang}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
         </nav>
       </aside>
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        <header className="lg:hidden px-6 py-4 bg-white border-b border-slate-100 flex items-center justify-between sticky top-0 z-30">
-          <Link
-            href="/aisama-lang"
-            className="text-xl font-black italic flex items-center gap-2 text-slate-800"
-          >
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <Bolt className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-            </div>
-            AIsama OS
-          </Link>
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-slate-100 overflow-hidden border-2 border-white shadow-sm">
-              <div className="w-full h-full bg-blue-500/10 flex items-center justify-center text-[8px] font-black text-blue-600 uppercase">
+        <header className="lg:hidden px-4 py-3 bg-white border-b border-slate-100 sticky top-0 z-30">
+          <div className="flex items-center justify-between mb-3">
+            <Link
+              href="/aisama-lang"
+              className="text-lg font-black italic flex items-center gap-2 text-slate-800"
+            >
+              <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
+                <Bolt className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+              </div>
+              AIsama OS
+            </Link>
+            <div className="w-7 h-7 rounded-full bg-slate-100 overflow-hidden border-2 border-white shadow-sm">
+              <div className="w-full h-full bg-blue-500/10 flex items-center justify-center text-[7px] font-black text-blue-600 uppercase">
                 {user?.email?.[0] || "?"}
               </div>
             </div>
+          </div>
+          {/* Mobile Language Switcher */}
+          <div className="flex gap-2">
+            {languages.map((lang) => (
+              <button
+                key={lang}
+                onClick={() => setSelectedLang(lang)}
+                className={cn(
+                  "flex-1 py-2 rounded-xl text-[10px] font-black transition-all",
+                  selectedLang === lang
+                    ? "bg-blue-600 text-white shadow-lg shadow-blue-200"
+                    : "bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600",
+                )}
+              >
+                {lang}
+              </button>
+            ))}
           </div>
         </header>
         <div className="flex-1 overflow-y-auto scroll-smooth">

@@ -21,6 +21,7 @@ import {
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
+import { useLanguage } from "./LanguageContext";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -49,8 +50,16 @@ const typeColor: Record<ItemType, string> = {
 
 export const ItemsPage = () => {
   const router = useRouter();
-  const [selectedLang, setSelectedLang] =
-    useState<Exclude<Language, "JP">>("EN");
+  const { selectedLang: globalLang, setSelectedLang: setGlobalLang } =
+    useLanguage();
+  // Use global lang if it's not JP, otherwise default to EN
+  const selectedLang: Exclude<Language, "JP"> =
+    globalLang === "JP" ? "EN" : globalLang;
+
+  // Sync global lang when local changes
+  const setSelectedLang = (lang: Exclude<Language, "JP">) => {
+    setGlobalLang(lang);
+  };
   const [selectedType, setSelectedType] = useState<ItemType | "all">("all");
   const [items, setItems] = useState<LearningItem[]>([]);
   const [videos, setVideos] = useState<Video[]>([]);

@@ -43,6 +43,7 @@ import {
   YAxis,
 } from "recharts";
 import { twMerge } from "tailwind-merge";
+import { useLanguage } from "./LanguageContext";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -58,8 +59,9 @@ const statusLabel: Record<VideoStatus, string> = {
 export const VideoDetail = () => {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const { selectedLang: activeTab, setSelectedLang: setActiveTab } =
+    useLanguage();
   const [video, setVideo] = useState<Video | null>(null);
-  const [activeTab, setActiveTab] = useState<Language>("JP");
   const [scripts, setScripts] = useState<Script[]>([]);
   const [learningItems, setLearningItems] = useState<LearningItem[]>([]);
   const [scores, setScores] = useState<SpeakingScore[]>([]);
