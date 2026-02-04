@@ -64,6 +64,7 @@ export const VideoDetail = () => {
   const [flippedIds, setFlippedIds] = useState<Set<string>>(new Set());
   const [activeItemType, setActiveItemType] = useState<ItemType | "all">("all");
   const [isScriptCollapsed, setIsScriptCollapsed] = useState(true);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -174,6 +175,7 @@ export const VideoDetail = () => {
             usage: i.usage || i.explanation || i.note || "",
             priority: (i.priority || "med") as any,
             active: true,
+            is_favorite: false,
             created_at: new Date().toISOString(),
           });
         });
@@ -239,6 +241,17 @@ export const VideoDetail = () => {
       setLearningItems(iList);
     } catch (error) {
       console.error("Error toggling item:", error);
+    }
+  };
+
+  const handleToggleFavorite = async (itemId: string) => {
+    if (!video) return;
+    try {
+      await db.learningItems.toggleFavorite(itemId);
+      const iList = await db.learningItems.list(video.video_id);
+      setLearningItems(iList);
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
     }
   };
 
@@ -441,46 +454,68 @@ export const VideoDetail = () => {
             </div>
 
             {/* Type Filters */}
-            <div className="px-6 md:px-12 py-4 sm:py-6 bg-slate-50/30 border-b border-slate-50 flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide">
-              <button
-                onClick={() => setActiveItemType("all")}
-                className={cn(
-                  "px-6 py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all shrink-0",
-                  activeItemType === "all"
-                    ? "bg-slate-900 text-white shadow-lg"
-                    : "text-slate-400 hover:text-slate-600 hover:bg-white/50",
-                )}
-              >
-                ALL
-              </button>
-              {(["vocab", "grammar", "phrase", "mistake"] as ItemType[]).map(
-                (type) => (
-                  <button
-                    key={type}
-                    onClick={() => setActiveItemType(type)}
+            <div className="px-6 md:px-12 py-4 sm:py-6 bg-slate-50/30 border-b border-slate-50 flex flex-wrap gap-3 sm:gap-4 overflow-x-auto scrollbar-hide">
+              <div className="flex gap-2 sm:gap-4 pr-4 border-r border-slate-200 shrink-0">
+                <button
+                  onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                  className={cn(
+                    "px-4 sm:px-5 py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2",
+                    showFavoritesOnly
+                      ? "bg-yellow-400 text-slate-900 shadow-lg shadow-yellow-100"
+                      : "bg-white text-slate-400 border border-slate-100 hover:text-yellow-600 hover:border-yellow-200",
+                  )}
+                >
+                  <Star
                     className={cn(
-                      "px-5 sm:px-6 py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shrink-0",
-                      activeItemType === type
-                        ? "bg-indigo-600 text-white shadow-lg"
-                        : "text-slate-400 hover:text-slate-600 hover:bg-white/50",
+                      "w-3 h-3",
+                      showFavoritesOnly ? "fill-slate-900" : "",
                     )}
-                  >
-                    {type === "vocab" && <Tag className="w-3 h-3" />}
-                    {type === "grammar" && <FileText className="w-3 h-3" />}
-                    {type === "phrase" && <MapPin className="w-3 h-3" />}
-                    {type === "mistake" && (
-                      <TriangleAlert className="w-3 h-3" />
-                    )}
-                    {type === "vocab"
-                      ? "Vocab"
-                      : type === "grammar"
-                        ? "Grammar"
-                        : type === "phrase"
-                          ? "Phrases"
-                          : "Mistakes"}
-                  </button>
-                ),
-              )}
+                  />
+                  FAVORITES
+                </button>
+              </div>
+
+              <div className="flex gap-2 sm:gap-4 items-center">
+                <button
+                  onClick={() => setActiveItemType("all")}
+                  className={cn(
+                    "px-6 py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all shrink-0",
+                    activeItemType === "all"
+                      ? "bg-slate-900 text-white shadow-lg"
+                      : "text-slate-400 hover:text-slate-600 hover:bg-white/50",
+                  )}
+                >
+                  ALL
+                </button>
+                {(["vocab", "grammar", "phrase", "mistake"] as ItemType[]).map(
+                  (type) => (
+                    <button
+                      key={type}
+                      onClick={() => setActiveItemType(type)}
+                      className={cn(
+                        "px-5 sm:px-6 py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shrink-0",
+                        activeItemType === type
+                          ? "bg-indigo-600 text-white shadow-lg"
+                          : "text-slate-400 hover:text-slate-600 hover:bg-white/50",
+                      )}
+                    >
+                      {type === "vocab" && <Tag className="w-3 h-3" />}
+                      {type === "grammar" && <FileText className="w-3 h-3" />}
+                      {type === "phrase" && <MapPin className="w-3 h-3" />}
+                      {type === "mistake" && (
+                        <TriangleAlert className="w-3 h-3" />
+                      )}
+                      {type === "vocab"
+                        ? "Vocab"
+                        : type === "grammar"
+                          ? "Grammar"
+                          : type === "phrase"
+                            ? "Phrases"
+                            : "Mistakes"}
+                    </button>
+                  ),
+                )}
+              </div>
             </div>
 
             <div className="p-6 md:p-12">
@@ -499,7 +534,9 @@ export const VideoDetail = () => {
                     .filter(
                       (i) =>
                         i.language === activeTab &&
-                        (activeItemType === "all" || i.type === activeItemType),
+                        (activeItemType === "all" ||
+                          i.type === activeItemType) &&
+                        (!showFavoritesOnly || i.is_favorite),
                     )
                     .map((item) => (
                       <div
@@ -544,20 +581,41 @@ export const VideoDetail = () => {
                                   <TriangleAlert className="w-5 h-5 sm:w-6 sm:h-6" />
                                 )}
                               </div>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleToggleItem(item.id);
-                                }}
-                                className={cn(
-                                  "w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all pointer-events-auto",
-                                  item.active
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-slate-100 text-slate-300",
-                                )}
-                              >
-                                <Check className="w-4 h-4 sm:w-5 sm:h-5 stroke-[3px]" />
-                              </button>
+                              <div className="flex items-center gap-2 sm:gap-3 pointer-events-auto">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleToggleFavorite(item.id);
+                                  }}
+                                  className={cn(
+                                    "w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all",
+                                    item.is_favorite
+                                      ? "bg-yellow-400 text-white shadow-lg shadow-yellow-200"
+                                      : "bg-slate-100 text-slate-300 hover:bg-yellow-50 hover:text-yellow-400",
+                                  )}
+                                >
+                                  <Star
+                                    className={cn(
+                                      "w-4 h-4 sm:w-5 sm:h-5",
+                                      item.is_favorite ? "fill-white" : "",
+                                    )}
+                                  />
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleToggleItem(item.id);
+                                  }}
+                                  className={cn(
+                                    "w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all",
+                                    item.active
+                                      ? "bg-blue-600 text-white"
+                                      : "bg-slate-100 text-slate-300",
+                                  )}
+                                >
+                                  <Check className="w-4 h-4 sm:w-5 sm:h-5 stroke-[3px]" />
+                                </button>
+                              </div>
                             </div>
                             <div className="w-full">
                               <p className="text-lg sm:text-3xl font-black text-slate-800 tracking-tight italic uppercase break-words px-2">

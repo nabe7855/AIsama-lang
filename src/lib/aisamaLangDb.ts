@@ -108,6 +108,7 @@ export const db = {
         usage: item.usage,
         priority: item.priority || "med",
         active: item.active,
+        is_favorite: item.is_favorite || false,
       });
       if (error) throw error;
     },
@@ -123,6 +124,7 @@ export const db = {
           usage: item.usage,
           priority: item.priority || "med",
           active: item.active,
+          is_favorite: item.is_favorite || false,
         })),
       );
       if (error) throw error;
@@ -143,6 +145,21 @@ export const db = {
       const { error } = await supabase
         .from("learning_items")
         .update({ active: !item.active })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    toggleFavorite: async (id: string) => {
+      const { data: item, error: getError } = await supabase
+        .from("learning_items")
+        .select("is_favorite")
+        .eq("id", id)
+        .single();
+
+      if (getError) throw getError;
+
+      const { error } = await supabase
+        .from("learning_items")
+        .update({ is_favorite: !item.is_favorite })
         .eq("id", id);
       if (error) throw error;
     },

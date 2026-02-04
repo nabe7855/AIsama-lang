@@ -13,6 +13,7 @@ import {
   MessageCircle,
   Plus,
   Search,
+  Star,
   Trash2,
   Type,
   X,
@@ -55,6 +56,7 @@ export const ItemsPage = () => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [flippedIds, setFlippedIds] = useState<Set<string>>(new Set());
 
   const refresh = async () => {
@@ -82,6 +84,11 @@ export const ItemsPage = () => {
         );
       }
 
+      // Favorite filter
+      if (showFavoritesOnly) {
+        all = all.filter((i) => i.is_favorite);
+      }
+
       setItems(all.reverse());
     } catch (error) {
       console.error("Error refreshing items:", error);
@@ -90,7 +97,7 @@ export const ItemsPage = () => {
 
   useEffect(() => {
     refresh();
-  }, [selectedLang, selectedType, searchQuery]);
+  }, [selectedLang, selectedType, searchQuery, showFavoritesOnly]);
 
   const handleManualAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,6 +122,7 @@ export const ItemsPage = () => {
         usage: d.get("usage") as string,
         priority: "med",
         active: true,
+        is_favorite: false,
         created_at: new Date().toISOString(),
       });
 
@@ -132,6 +140,15 @@ export const ItemsPage = () => {
       await refresh();
     } catch (error) {
       console.error("Error toggling item:", error);
+    }
+  };
+
+  const handleToggleFavorite = async (id: string) => {
+    try {
+      await db.learningItems.toggleFavorite(id);
+      await refresh();
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
     }
   };
 
@@ -268,6 +285,26 @@ export const ItemsPage = () => {
           ))}
         </div>
 
+        <div className="flex bg-white p-2 rounded-2xl sm:rounded-[2rem] border-2 border-slate-100 shadow-sm w-full lg:w-auto shrink-0">
+          <button
+            onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+            className={cn(
+              "px-6 sm:px-8 py-3 sm:py-3.5 text-[10px] sm:text-xs font-black rounded-xl sm:rounded-2xl transition-all duration-300 flex items-center gap-2",
+              showFavoritesOnly
+                ? "bg-yellow-400 text-slate-900 shadow-xl"
+                : "text-slate-400 hover:text-slate-600 hover:bg-slate-50",
+            )}
+          >
+            <Star
+              className={cn(
+                "w-3.5 h-3.5",
+                showFavoritesOnly ? "fill-slate-900" : "",
+              )}
+            />
+            お気に入り
+          </button>
+        </div>
+
         <div className="flex bg-white p-2 rounded-2xl sm:rounded-[2rem] border-2 border-slate-100 shadow-sm w-full lg:w-fit overflow-x-auto whitespace-nowrap scrollbar-hide">
           <button
             onClick={() => setSelectedType("all")}
@@ -344,6 +381,25 @@ export const ItemsPage = () => {
                       <Icon className="w-6 h-6" />
                     </div>
                     <div className="flex items-center gap-2 pointer-events-auto">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleFavorite(item.id);
+                        }}
+                        className={cn(
+                          "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-md",
+                          item.is_favorite
+                            ? "bg-yellow-400 text-white scale-110 shadow-yellow-100"
+                            : "bg-white text-slate-400 hover:text-yellow-600",
+                        )}
+                      >
+                        <Star
+                          className={cn(
+                            "w-4 h-4",
+                            item.is_favorite ? "fill-white" : "",
+                          )}
+                        />
+                      </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

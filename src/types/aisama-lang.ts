@@ -37,6 +37,7 @@ export interface LearningItem {
   usage?: string; // for phrase
   priority: Priority;
   active: boolean;
+  is_favorite: boolean;
   created_at: string;
 }
 
