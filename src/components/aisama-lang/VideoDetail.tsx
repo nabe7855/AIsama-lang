@@ -33,6 +33,15 @@ import {
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { twMerge } from "tailwind-merge";
 
 function cn(...inputs: ClassValue[]) {
@@ -68,6 +77,9 @@ export const VideoDetail = () => {
   const [isImportingScore, setIsImportingScore] = useState(false);
   const [isShowingScorePrompt, setIsShowingScorePrompt] = useState(false);
   const [scoreJsonInput, setScoreJsonInput] = useState("");
+  const [selectedScore, setSelectedScore] = useState<SpeakingScore | null>(
+    null,
+  );
 
   useEffect(() => {
     const init = async () => {
@@ -733,83 +745,97 @@ export const VideoDetail = () => {
               </button>
             </div>
 
-            <div className="p-6 md:p-8 space-y-6 overflow-y-auto scrollbar-hide flex-1">
+            <div className="p-6 md:p-8 space-y-6 overflow-y-auto scrollbar-hide flex-1 flex flex-col min-h-[400px]">
               {scores.filter((s) => s.language === activeTab).length > 0 ? (
-                scores
-                  .filter((s) => s.language === activeTab)
-                  .reverse()
-                  .map((score, idx) => (
-                    <div
-                      key={score.id}
-                      className={cn(
-                        "p-6 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border-2 transition-all duration-500 group overflow-hidden relative",
-                        idx === 0
-                          ? "bg-slate-900 text-white border-transparent shadow-2xl scale-[1.01]"
-                          : "bg-white border-slate-50 hover:border-blue-100",
-                      )}
+                <div className="flex-1 w-full min-h-[300px] mt-4">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart
+                      data={scores
+                        .filter((s) => s.language === activeTab)
+                        .sort(
+                          (a, b) =>
+                            new Date(a.date).getTime() -
+                            new Date(b.date).getTime(),
+                        )}
+                      margin={{ top: 20, right: 20, left: -20, bottom: 0 }}
+                      onClick={(data: any) => {
+                        if (data && data.activePayload) {
+                          setSelectedScore(data.activePayload[0].payload);
+                        }
+                      }}
                     >
-                      {idx === 0 && (
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 blur-3xl -mr-16 -mt-16"></div>
-                      )}
-
-                      <div className="flex justify-between items-center mb-6 relative z-10">
-                        <span
-                          className={cn(
-                            "text-[10px] font-black uppercase tracking-widest",
-                            idx === 0 ? "text-blue-400" : "text-slate-300",
-                          )}
-                        >
-                          {score.date}
-                        </span>
-                        <div className="flex flex-col items-end">
-                          <span
-                            className={cn(
-                              "text-4xl font-black italic leading-none",
-                              score.total >= 75
-                                ? "text-green-400 underline decoration-green-400/30 decoration-8 underline-offset-4"
-                                : idx === 0
-                                  ? "text-white"
-                                  : "text-slate-800",
-                            )}
-                          >
-                            {score.total}
-                          </span>
-                          <span
-                            className={cn(
-                              "text-[9px] font-black mt-1",
-                              idx === 0 ? "text-slate-500" : "text-slate-300",
-                            )}
-                          >
-                            SCORE
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="space-y-4 relative z-10">
-                        <p
-                          className={cn(
-                            "text-xs font-black leading-relaxed",
-                            idx === 0 ? "text-white" : "text-slate-700",
-                          )}
-                        >
-                          {score.main_problem}
-                        </p>
-                        <div
-                          className={cn(
-                            "p-4 rounded-2xl text-[10px] font-bold italic flex items-start gap-3",
-                            idx === 0
-                              ? "bg-white/5 text-blue-300"
-                              : "bg-blue-50 text-blue-600",
-                          )}
-                        >
-                          <Bolt className="w-3 h-3 flex-shrink-0 mt-0.5 fill-current" />
-                          {score.improvement_tip}
-                        </div>
-                      </div>
-                    </div>
-                  ))
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        vertical={false}
+                        stroke="#f1f5f9"
+                      />
+                      <XAxis
+                        dataKey="date"
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{
+                          fontSize: 10,
+                          fontWeight: "900",
+                          fill: "#94a3b8",
+                        }}
+                        dy={10}
+                      />
+                      <YAxis
+                        domain={[0, 100]}
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{
+                          fontSize: 10,
+                          fontWeight: "900",
+                          fill: "#cbd5e1",
+                        }}
+                      />
+                      <Tooltip
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            return (
+                              <div className="bg-slate-900 text-white p-3 rounded-xl shadow-2xl border border-white/10">
+                                <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 mb-1">
+                                  {payload[0].payload.date}
+                                </p>
+                                <p className="text-xl font-black italic">
+                                  {payload[0].value}
+                                  <span className="text-[10px] ml-1">PTS</span>
+                                </p>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="total"
+                        stroke="#4f46e5"
+                        strokeWidth={4}
+                        dot={{
+                          r: 6,
+                          fill: "#4f46e5",
+                          strokeWidth: 2,
+                          stroke: "#fff",
+                        }}
+                        activeDot={{
+                          r: 8,
+                          fill: "#4f46e5",
+                          strokeWidth: 4,
+                          stroke: "#fff",
+                          onClick: (e, payload: any) =>
+                            setSelectedScore(payload.payload),
+                        }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                  <p className="text-center text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mt-6">
+                    Tap any point to see details
+                  </p>
+                </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-32 text-slate-200 border-4 border-dashed border-slate-50 rounded-[3rem]">
+                <div className="flex flex-col items-center justify-center py-32 text-slate-200 border-4 border-dashed border-slate-50 rounded-[3rem] flex-1">
                   <Activity className="w-16 h-16 mb-4 opacity-10" />
                   <p className="font-black text-xs uppercase tracking-[0.2em]">
                     No records for {activeTab}
@@ -1200,6 +1226,97 @@ Start evaluation now.`;
                 className="w-full py-8 bg-blue-600 text-white font-black rounded-[2.5rem] shadow-2xl shadow-blue-200 hover:bg-blue-700 hover:scale-[1.02] active:scale-95 transition-all duration-300 text-base tracking-[0.3em] uppercase italic"
               >
                 IMPORT PERFORMANCE SCORE
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Score Detail Overlay */}
+      {selectedScore && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 sm:p-6 bg-slate-900/80 backdrop-blur-2xl animate-in fade-in duration-300">
+          <div className="bg-white rounded-[2.5rem] sm:rounded-[4rem] shadow-2xl w-full max-w-2xl overflow-hidden animate-in slide-in-from-bottom-10 zoom-in-95 duration-500">
+            <div className="p-8 sm:p-12 border-b border-slate-50 flex justify-between items-center bg-slate-900 text-white relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 blur-[80px] -mr-32 -mt-32"></div>
+              <div className="relative z-10">
+                <p className="text-[10px] font-black text-blue-400 uppercase tracking-[0.3em] mb-2">
+                  {selectedScore.date} / PERFORMANCE
+                </p>
+                <h3 className="text-4xl sm:text-6xl font-black italic tracking-tighter leading-none">
+                  {selectedScore.total}
+                  <span className="text-xl sm:text-2xl text-slate-500 not-italic ml-2 uppercase font-black">
+                    pts
+                  </span>
+                </h3>
+              </div>
+              <button
+                onClick={() => setSelectedScore(null)}
+                className="relative z-10 w-12 h-12 sm:w-16 sm:h-16 rounded-[1.5rem] sm:rounded-[2rem] bg-white/10 text-white/40 hover:text-white hover:bg-white/20 transition-all flex items-center justify-center"
+              >
+                <X className="w-6 h-6 sm:w-8 h-8" />
+              </button>
+            </div>
+            <div className="p-8 sm:p-12 space-y-8 sm:space-y-10 overflow-y-auto max-h-[60vh] scrollbar-hide">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {[
+                  { label: "PRON", val: selectedScore.pronunciation },
+                  { label: "GRAM", val: selectedScore.grammar },
+                  { label: "FLUEN", val: selectedScore.fluency },
+                  { label: "CLAR", val: selectedScore.clarity },
+                ].map((s) => (
+                  <div
+                    key={s.label}
+                    className="text-center p-4 bg-slate-50 rounded-3xl border border-slate-100"
+                  >
+                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                      {s.label}
+                    </p>
+                    <p className="text-xl font-black text-slate-800 italic">
+                      {s.val}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                    <TriangleAlert className="w-4 h-4 text-orange-500" />
+                    Main Problem
+                  </h4>
+                  <p className="text-sm font-bold text-slate-600 leading-relaxed bg-orange-50/30 p-6 rounded-3xl border border-orange-100/50 italic">
+                    {selectedScore.main_problem}
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                    <Bolt className="w-4 h-4 text-blue-500" />
+                    Improvement Tip
+                  </h4>
+                  <p className="text-sm font-black text-blue-600 leading-relaxed bg-blue-50/30 p-6 rounded-3xl border border-blue-100/50 italic">
+                    {selectedScore.improvement_tip}
+                  </p>
+                </div>
+
+                {selectedScore.comment && (
+                  <div>
+                    <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                      <History className="w-4 h-4 text-slate-400" />
+                      AI Comment
+                    </h4>
+                    <p className="text-xs font-medium text-slate-500 leading-relaxed">
+                      {selectedScore.comment}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="p-8 sm:p-12 bg-slate-50/50 border-t border-slate-50">
+              <button
+                onClick={() => setSelectedScore(null)}
+                className="w-full py-6 bg-slate-900 text-white font-black rounded-3xl shadow-xl shadow-slate-200 hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-widest italic"
+              >
+                CLOSE REPORT
               </button>
             </div>
           </div>
