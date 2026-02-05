@@ -1,6 +1,7 @@
 "use client";
 
 import { db } from "@/lib/aisamaLangDb";
+import { calculateLevelStats } from "@/lib/levelSystem";
 import { Language, Video, VideoStatus } from "@/types/aisama-lang";
 import { clsx, type ClassValue } from "clsx";
 import {
@@ -50,6 +51,8 @@ export const Dashboard = () => {
         setStatusCounts(counts);
 
         const allScores = await db.scores.listAll();
+        const allItems = await db.learningItems.listAll();
+
         const scores = activeLanguages
           .filter((l) => l !== "JP")
           .map((lang: Language) => {
@@ -57,7 +60,11 @@ export const Dashboard = () => {
             const latest = langScores.sort(
               (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
             )[0];
-            return { lang, latest };
+
+            const langItems = allItems.filter((i) => i.language === lang);
+            const levelStats = calculateLevelStats(langItems);
+
+            return { lang, latest, levelStats };
           });
         setLatestScores(scores);
       } catch (error) {
@@ -113,10 +120,10 @@ export const Dashboard = () => {
 
       {/* Language Scores */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-        {latestScores.map(({ lang, latest }) => (
+        {latestScores.map(({ lang, latest, levelStats }) => (
           <div
             key={lang}
-            className="bg-white p-6 sm:p-8 rounded-[2.5rem] sm:rounded-[3rem] shadow-xl shadow-slate-100 border border-slate-50 relative overflow-hidden group hover:scale-[1.02] transition-all duration-500"
+            className="bg-white p-6 sm:p-8 rounded-[2.5rem] sm:rounded-[3rem] shadow-xl shadow-slate-100 border border-slate-50 relative overflow-hidden group hover:scale-[1.02] transition-all duration-500 flex flex-col min-h-[460px]"
           >
             <div
               className={cn(
@@ -129,7 +136,7 @@ export const Dashboard = () => {
               )}
             ></div>
 
-            <div className="flex justify-between items-center mb-8 sm:mb-10">
+            <div className="flex justify-between items-center mb-6">
               <div
                 className={cn(
                   "w-12 h-12 sm:w-14 sm:h-14 rounded-[1rem] sm:rounded-[1.25rem] flex items-center justify-center font-black text-base sm:text-lg shadow-lg",
@@ -150,32 +157,73 @@ export const Dashboard = () => {
               )}
             </div>
 
-            {latest ? (
-              <div className="space-y-6">
-                <div>
-                  <div className="text-6xl font-black text-slate-800 tracking-tighter flex items-end gap-1">
-                    {latest.total}
-                    <span className="text-xl text-slate-300 font-bold mb-2">
-                      /100
-                    </span>
+            <div className="flex-1 flex flex-col justify-between space-y-8">
+              {/* Level & Milestone Section */}
+              <div className="bg-slate-900 rounded-[2rem] p-6 text-white space-y-4 shadow-2xl">
+                <div className="flex justify-between items-center">
+                  <p className="text-[10px] font-black italic text-blue-400 tracking-widest uppercase">
+                    Next Milestone:
+                  </p>
+                  <div className="px-2 py-0.5 rounded-md bg-blue-600 text-[8px] font-black uppercase tracking-tighter shadow-sm shadow-blue-400/30 animate-pulse">
+                    Live
                   </div>
                 </div>
-                <div className="pt-6 border-t border-slate-50">
-                  <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-2 flex items-center gap-2">
-                    <Play className="w-3 h-3 fill-slate-400" />
-                    Latest Project
-                  </p>
-                  <p className="text-sm font-black text-slate-700 truncate">
-                    {latest.video_id}
-                  </p>
+
+                <div className="space-y-3">
+                  <div className="h-3 bg-white/10 rounded-full overflow-hidden p-0.5">
+                    <div
+                      className="h-full bg-blue-500 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.6)] transition-all duration-1000 ease-out"
+                      style={{ width: `${levelStats.progressPercent}%` }}
+                    ></div>
+                  </div>
+                  <div className="flex justify-between items-end">
+                    <div className="flex flex-col">
+                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">
+                        Current
+                      </span>
+                      <span className="text-sm font-black italic tracking-tighter">
+                        {levelStats.currentLevel} LEVEL
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] font-black text-white italic tracking-tighter">
+                        {levelStats.progressPercent}% COMPLETE
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-10 text-slate-300">
-                <Trophy className="w-12 h-12 mb-3 opacity-20" />
-                <p className="text-sm font-bold italic">No data recorded</p>
+
+              {/* Latest Score Section */}
+              <div className="space-y-4">
+                {latest ? (
+                  <>
+                    <div className="text-6xl font-black text-slate-800 tracking-tighter flex items-end gap-1">
+                      {latest.total}
+                      <span className="text-xl text-slate-200 font-bold mb-2">
+                        /100
+                      </span>
+                    </div>
+                    <div className="pt-4 border-t border-slate-50">
+                      <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                        <Play className="w-3 h-3 fill-slate-400" />
+                        Latest Project
+                      </p>
+                      <p className="text-xs font-black text-slate-600 truncate">
+                        {latest.video_id}
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-6 text-slate-200 grayscale opacity-50">
+                    <Trophy className="w-8 h-8 mb-2" />
+                    <p className="text-[10px] font-black italic uppercase tracking-widest">
+                      No recordings yet
+                    </p>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
         ))}
       </div>
