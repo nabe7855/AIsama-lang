@@ -493,13 +493,6 @@ export const VideoDetail = () => {
                         Smart Gen
                       </button>
                       <button
-                        onClick={() => setIsShowingPrompt(true)}
-                        className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-slate-100 text-slate-600 rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] tracking-[0.1em] sm:tracking-[0.2em] hover:bg-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2 uppercase italic"
-                      >
-                        <Tag className="w-3 h-3" />
-                        PROMPT
-                      </button>
-                      <button
                         onClick={handleDownloadCSV}
                         className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-white border-2 border-slate-100 text-slate-500 rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] tracking-[0.1em] sm:tracking-[0.2em] hover:bg-slate-50 transition-all active:scale-95 flex items-center justify-center gap-2 uppercase italic"
                       >
@@ -554,9 +547,18 @@ export const VideoDetail = () => {
                   </div>
                   アイテム
                 </h3>
-                <div className="w-full sm:w-auto px-4 sm:px-5 py-2 sm:py-2.5 bg-slate-50 rounded-full text-[8px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center justify-center gap-2">
-                  <Check className="w-3 h-3" />
-                  {activeTab}
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <button
+                    onClick={() => setIsShowingPrompt(true)}
+                    className="flex-1 sm:flex-none px-3 py-2 bg-slate-100 text-slate-500 rounded-xl font-black text-[8px] sm:text-[10px] tracking-[0.1em] hover:bg-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2 uppercase italic"
+                  >
+                    <Tag className="w-3 h-3" />
+                    PROMPT
+                  </button>
+                  <div className="px-4 sm:px-5 py-2 sm:py-2.5 bg-slate-50 rounded-full text-[8px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center justify-center gap-2">
+                    <Check className="w-3 h-3" />
+                    {activeTab}
+                  </div>
                 </div>
               </div>
 
