@@ -38,6 +38,11 @@ export interface LearningItem {
   priority: Priority;
   active: boolean;
   is_favorite: boolean;
+  // Adaptive Learning Fields
+  mastery_score?: number; // 0-100
+  last_reviewed_at?: string;
+  error_count?: number;
+  priority_score?: number; // Computed score
   created_at: string;
 }
 

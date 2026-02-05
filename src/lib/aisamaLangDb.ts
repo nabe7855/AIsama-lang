@@ -109,6 +109,10 @@ export const db = {
         priority: item.priority || "med",
         active: item.active,
         is_favorite: item.is_favorite || false,
+        mastery_score: item.mastery_score ?? 0,
+        error_count: item.error_count ?? 0,
+        last_reviewed_at: item.last_reviewed_at,
+        priority_score: item.priority_score ?? 0,
       });
       if (error) throw error;
     },
@@ -125,6 +129,10 @@ export const db = {
           priority: item.priority || "med",
           active: item.active,
           is_favorite: item.is_favorite || false,
+          mastery_score: item.mastery_score ?? 0,
+          error_count: item.error_count ?? 0,
+          last_reviewed_at: item.last_reviewed_at,
+          priority_score: item.priority_score ?? 0,
         })),
       );
       if (error) throw error;
@@ -160,6 +168,38 @@ export const db = {
       const { error } = await supabase
         .from("learning_items")
         .update({ is_favorite: !item.is_favorite })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    updateMastery: async (id: string, newMastery: number) => {
+      const { error } = await supabase
+        .from("learning_items")
+        .update({
+          mastery_score: newMastery,
+          last_reviewed_at: new Date().toISOString(),
+        })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    incrementErrorCount: async (id: string) => {
+      // Fetch current count first
+      const { data: item, error: getError } = await supabase
+        .from("learning_items")
+        .select("error_count, mastery_score")
+        .eq("id", id)
+        .single();
+      if (getError) throw getError;
+
+      const newErrorCount = (item.error_count || 0) + 1;
+      // Penalize mastery on error
+      const newMastery = Math.max(0, (item.mastery_score || 0) - 10);
+
+      const { error } = await supabase
+        .from("learning_items")
+        .update({
+          error_count: newErrorCount,
+          mastery_score: newMastery,
+        })
         .eq("id", id);
       if (error) throw error;
     },

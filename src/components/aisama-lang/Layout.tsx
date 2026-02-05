@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   ListChecks,
   LogOut,
+  Sparkles,
   Video,
 } from "lucide-react";
 import Link from "next/link";
@@ -42,6 +43,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
     { name: "ダッシュボード", path: "/aisama-lang", icon: LayoutDashboard },
     { name: "動画管理", path: "/aisama-lang/videos", icon: Video },
     { name: "学習アイテム", path: "/aisama-lang/items", icon: ListChecks },
+    { name: "ミッション作成", path: "/aisama-lang/builder", icon: Sparkles },
     { name: "CSV出力", path: "/aisama-lang/export", icon: FileOutput },
   ];
 
@@ -201,7 +203,9 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
                     ? "VIDEOS"
                     : item.name === "学習アイテム"
                       ? "ITEMS"
-                      : "EXPORT"}
+                      : item.name === "ミッション作成"
+                        ? "BUILD"
+                        : "EXPORT"}
               </span>
               {isActive(item.path) && (
                 <div className="w-1 h-1 rounded-full bg-blue-600 mt-0.5 animate-in zoom-in duration-300" />

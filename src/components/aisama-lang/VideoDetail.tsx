@@ -2,6 +2,11 @@
 
 import { db } from "@/lib/aisamaLangDb";
 import {
+  CEFRLevel,
+  ItemSelector,
+  SpecGenerator,
+} from "@/lib/boudgetSlotSystem";
+import {
   ItemType,
   Language,
   LearningItem,
@@ -72,6 +77,7 @@ export const VideoDetail = () => {
   const [isShowingScorePrompt, setIsShowingScorePrompt] = useState(false);
   const [scoreJsonInput, setScoreJsonInput] = useState("");
   const [selectedScores, setSelectedScores] = useState<SpeakingScore[]>([]);
+  const [isShowingWizard, setIsShowingWizard] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -259,6 +265,17 @@ export const VideoDetail = () => {
       setLearningItems(iList);
     } catch (error) {
       console.error("Error toggling favorite:", error);
+    }
+  };
+
+  const handleReportStumble = async (itemId: string) => {
+    if (!video) return;
+    try {
+      await db.learningItems.incrementErrorCount(itemId);
+      const iList = await db.learningItems.list(video.video_id);
+      setLearningItems(iList);
+    } catch (error) {
+      console.error("Error reporting stumble:", error);
     }
   };
 
@@ -469,10 +486,17 @@ export const VideoDetail = () => {
                   activeTab !== "JP" ? (
                     <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-3 w-full sm:w-auto">
                       <button
+                        onClick={() => setIsShowingWizard(true)}
+                        className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 text-white rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] tracking-[0.1em] sm:tracking-[0.2em] hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 active:scale-95 flex items-center justify-center gap-2 uppercase italic"
+                      >
+                        <Plus className="w-3 h-3" />
+                        Smart Gen
+                      </button>
+                      <button
                         onClick={() => setIsShowingPrompt(true)}
                         className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-slate-100 text-slate-600 rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] tracking-[0.1em] sm:tracking-[0.2em] hover:bg-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2 uppercase italic"
                       >
-                        <Plus className="w-3 h-3" />
+                        <Tag className="w-3 h-3" />
                         PROMPT
                       </button>
                       <button
@@ -676,6 +700,16 @@ export const VideoDetail = () => {
                                     )}
                                   >
                                     <Check className="w-4 h-4 stroke-[3px]" />
+                                  </button>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleReportStumble(item.id);
+                                    }}
+                                    title="苦手として報告（復習優先度が上がります）"
+                                    className="w-7 h-7 rounded-lg flex items-center justify-center transition-all bg-red-50 text-red-200 hover:bg-red-100 hover:text-red-500"
+                                  >
+                                    <TriangleAlert className="w-3.5 h-3.5" />
                                   </button>
                                 </div>
                               </div>
@@ -1115,6 +1149,17 @@ Start evaluation now.`;
           </div>
         </div>
       )}
+      {/* Smart Script Wizard */}
+      {isShowingWizard && (
+        <SmartScriptWizard
+          videoId={video.video_id}
+          activeTab={activeTab}
+          scripts={scripts}
+          learningItems={learningItems}
+          onClose={() => setIsShowingWizard(false)}
+        />
+      )}
+
       {/* Score Modal */}
       <ScoreDetailModal
         scores={selectedScores}
@@ -1317,6 +1362,210 @@ const ScoreDetailModal = ({
               </div>
             </button>
           ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const SmartScriptWizard = ({
+  videoId,
+  activeTab,
+  scripts,
+  learningItems,
+  onClose,
+}: {
+  videoId: string;
+  activeTab: Language;
+  scripts: Script[];
+  learningItems: LearningItem[];
+  onClose: () => void;
+}) => {
+  const [level, setLevel] = useState<CEFRLevel>("B1");
+  const [duration, setDuration] = useState(60);
+  const [persona, setPersona] = useState("");
+  const [baseScriptId, setBaseScriptId] = useState<string>("");
+  const [isCopied, setIsCopied] = useState(false);
+
+  const jpScripts = scripts.filter((s) => s.language === "JP");
+
+  const speeds: Record<Language, number> = {
+    EN: 2.5, // words/sec
+    JP: 5.5, // chars/sec
+    ZH: 3.5, // chars/sec
+    ES: 2.5, // words/sec
+  };
+  const estimatedAmount = Math.floor(duration * (speeds[activeTab] || 2.5));
+  const unit = activeTab === "JP" || activeTab === "ZH" ? "文字" : "語";
+
+  // Auto-select latest JP script
+  useEffect(() => {
+    if (jpScripts.length > 0 && !baseScriptId) {
+      setBaseScriptId(jpScripts[jpScripts.length - 1].id);
+    }
+  }, [jpScripts]);
+
+  const baseScript = jpScripts.find((s) => s.id === baseScriptId);
+
+  const handleCopy = () => {
+    const { weakItems, reviewItems } = ItemSelector.selectItems(
+      learningItems,
+      { weakCount: 4, reviewCount: 4, newCount: 0 },
+      activeTab,
+    );
+
+    const spec = SpecGenerator.generate(
+      activeTab,
+      "Daily Conversation",
+      weakItems,
+      reviewItems,
+      {
+        level,
+        durationSeconds: duration,
+        persona,
+        baseScript: baseScript?.text,
+      },
+    );
+
+    const prompt = SpecGenerator.renderToPrompt(spec);
+    navigator.clipboard.writeText(prompt);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
+
+  return (
+    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 sm:p-6 bg-slate-900/80 backdrop-blur-2xl animate-in fade-in duration-300">
+      <div className="bg-white rounded-[2.5rem] sm:rounded-[4rem] shadow-2xl w-full max-w-2xl overflow-hidden animate-in slide-in-from-bottom-10 zoom-in-95 duration-500 flex flex-col max-h-[90vh]">
+        <div className="p-8 sm:p-12 border-b border-slate-50 flex justify-between items-center bg-blue-600 text-white relative overflow-hidden shrink-0">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 blur-[80px] -mr-32 -mt-32"></div>
+          <div className="relative z-10">
+            <h3 className="text-2xl sm:text-3xl font-black italic tracking-tighter">
+              SMART SCRIPT WIZARD
+            </h3>
+            <p className="text-[10px] text-blue-100 font-black uppercase mt-2 tracking-widest flex items-center gap-2">
+              <Star className="w-3 h-3 fill-current" />
+              Custom Prompt for {activeTab}
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="relative z-10 w-12 h-12 rounded-2xl bg-white/20 text-white hover:bg-white/30 transition-all flex items-center justify-center"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        <div className="p-8 sm:p-12 space-y-8 overflow-y-auto flex-1 scrollbar-hide">
+          {/* Base Script Select */}
+          <div className="space-y-3">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+              <FileText className="w-3 h-3 text-blue-500" />
+              Base Japanese Script
+            </label>
+            <select
+              value={baseScriptId}
+              onChange={(e) => setBaseScriptId(e.target.value)}
+              className="w-full p-4 rounded-2xl border-2 border-slate-50 bg-slate-50 text-sm font-bold outline-none focus:border-blue-500/20"
+            >
+              {jpScripts.length === 0 && (
+                <option value="">No JP scripts found</option>
+              )}
+              {jpScripts.map((s) => (
+                <option key={s.id} value={s.id}>
+                  Version {s.version} ({s.text.slice(0, 30)}...)
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-6">
+            {/* Level Select */}
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                <Activity className="w-3 h-3 text-green-500" />
+                CEFR Level
+              </label>
+              <select
+                value={level}
+                onChange={(e) => setLevel(e.target.value as CEFRLevel)}
+                className="w-full p-4 rounded-2xl border-2 border-slate-50 bg-slate-50 text-sm font-bold outline-none focus:border-blue-500/20"
+              >
+                {["A1", "A2", "B1", "B2", "C1", "C2"].map((l) => (
+                  <option key={l} value={l}>
+                    {l}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Duration Slider */}
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                <ChevronRight className="w-3 h-3 text-purple-500" />
+                Target Duration ({duration}s)
+              </label>
+              <div className="bg-slate-50 p-4 rounded-2xl border-2 border-slate-50 space-y-4">
+                <input
+                  type="range"
+                  min="10"
+                  max="300"
+                  step="10"
+                  value={duration}
+                  onChange={(e) => setDuration(parseInt(e.target.value))}
+                  className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                />
+                <div className="flex justify-between items-center">
+                  <span className="text-[9px] font-black text-slate-400">
+                    {duration}秒
+                  </span>
+                  <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-full italic">
+                    約 {estimatedAmount} {unit}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Persona Input */}
+          <div className="space-y-3">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+              <Star className="w-3 h-3 text-orange-500" />
+              Persona (Optional)
+            </label>
+            <input
+              placeholder="e.g. Steve Jobs, Elon Musk, Spider-Man..."
+              value={persona}
+              onChange={(e) => setPersona(e.target.value)}
+              className="w-full p-4 rounded-2xl border-2 border-slate-50 bg-slate-50 text-sm font-bold outline-none focus:border-blue-500/20"
+            />
+            <p className="text-[9px] text-slate-400 font-medium italic">
+              AI will mimic their tone and style.
+            </p>
+          </div>
+        </div>
+
+        <div className="p-8 sm:p-12 bg-slate-50 border-t border-slate-100 shrink-0">
+          <button
+            onClick={handleCopy}
+            className={cn(
+              "w-full py-6 rounded-3xl font-black text-sm tracking-[0.2em] uppercase italic transition-all duration-300 flex items-center justify-center gap-4 shadow-xl active:scale-95",
+              isCopied
+                ? "bg-green-500 text-white"
+                : "bg-slate-900 text-white hover:bg-blue-600",
+            )}
+          >
+            {isCopied ? (
+              <>
+                <Check className="w-5 h-5" />
+                COPIED TO CLIPBOARD
+              </>
+            ) : (
+              <>
+                <Copy className="w-5 h-5" />
+                GENERATE & COPY PROMPT
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>
