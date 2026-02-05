@@ -499,13 +499,6 @@ export const VideoDetail = () => {
                         <Download className="w-3 h-3" />
                         CSV
                       </button>
-                      <button
-                        onClick={() => setIsBulkImporting(true)}
-                        className="w-full sm:w-auto flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-indigo-600 text-white rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] tracking-[0.1em] sm:tracking-[0.2em] hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 active:scale-95 flex items-center justify-center gap-2 uppercase font-italic"
-                      >
-                        <Bolt className="w-3 h-3 fill-white" />
-                        IMPORT
-                      </button>
                     </div>
                   ) : null}
                 </div>
@@ -554,6 +547,13 @@ export const VideoDetail = () => {
                   >
                     <Tag className="w-3 h-3" />
                     PROMPT
+                  </button>
+                  <button
+                    onClick={() => setIsBulkImporting(true)}
+                    className="flex-1 sm:flex-none px-3 py-2 bg-indigo-600 text-white rounded-xl font-black text-[8px] sm:text-[10px] tracking-[0.1em] hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-95 flex items-center justify-center gap-2 uppercase italic"
+                  >
+                    <Bolt className="w-3 h-3 fill-white" />
+                    IMPORT
                   </button>
                   <div className="px-4 sm:px-5 py-2 sm:py-2.5 bg-slate-50 rounded-full text-[8px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center justify-center gap-2">
                     <Check className="w-3 h-3" />
