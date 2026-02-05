@@ -1,5 +1,5 @@
 export type VideoStatus = "draft" | "practicing" | "recorded" | "posted";
-export type Language = "JP" | "EN" | "ZH" | "ES";
+export type Language = string; // Allows arbitrary languages: "JP", "EN", "ZH", "ES", "FR", etc.
 export type ItemType = "grammar" | "vocab" | "phrase" | "mistake";
 export type Priority = "low" | "med" | "high";
 

@@ -51,7 +51,7 @@ const LevelDetails: Record<Language, Partial<Record<CEFRLevel, string>>> = {
   ES: {
     B1: "Pretérito perfecto, subjuntivo básico, modismos comunes.",
   },
-};
+} as any;
 
 export const ItemSelector = {
   selectItems: (
@@ -142,7 +142,7 @@ export const SpecGenerator = {
         ),
         complexity: `CEFR ${config.level}`,
         details:
-          LevelDetails[language]?.[config.level] ||
+          (LevelDetails[language] || LevelDetails["EN"])?.[config.level] ||
           "Standard level appropriate",
       },
       slots,

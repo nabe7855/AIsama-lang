@@ -56,8 +56,11 @@ const statusLabel: Record<VideoStatus, string> = {
 export const VideoDetail = () => {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { selectedLang: activeTab, setSelectedLang: setActiveTab } =
-    useLanguage();
+  const {
+    selectedLang: activeTab,
+    setSelectedLang: setActiveTab,
+    activeLanguages,
+  } = useLanguage();
   const [video, setVideo] = useState<Video | null>(null);
   const [scripts, setScripts] = useState<Script[]>([]);
   const [learningItems, setLearningItems] = useState<LearningItem[]>([]);
@@ -445,7 +448,7 @@ export const VideoDetail = () => {
           <div className="lg:col-span-12 xl:col-span-8">
             <div className="bg-white rounded-[2.5rem] md:rounded-[4rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col h-auto lg:h-[800px] group">
               <div className="flex bg-slate-50/50 p-2 sm:p-3 gap-2 border-b border-slate-100 overflow-x-auto scrollbar-hide">
-                {(["JP", "EN", "ZH", "ES"] as Language[]).map((lang) => (
+                {activeLanguages.map((lang: Language) => (
                   <button
                     key={lang}
                     onClick={() => setActiveTab(lang)}

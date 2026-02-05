@@ -1,7 +1,7 @@
 "use client";
 
 import { db } from "@/lib/aisamaLangDb";
-import { Video, VideoStatus } from "@/types/aisama-lang";
+import { Language, Video, VideoStatus } from "@/types/aisama-lang";
 import { clsx, type ClassValue } from "clsx";
 import {
   Activity,
@@ -15,6 +15,7 @@ import {
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
+import { useLanguage } from "./LanguageContext";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -28,6 +29,7 @@ const statusLabel: Record<VideoStatus, string> = {
 };
 
 export const Dashboard = () => {
+  const { activeLanguages } = useLanguage();
   const [videos, setVideos] = useState<Video[]>([]);
   const [statusCounts, setStatusCounts] = useState<Record<string, number>>({});
   const [latestScores, setLatestScores] = useState<any[]>([]);
@@ -48,13 +50,15 @@ export const Dashboard = () => {
         setStatusCounts(counts);
 
         const allScores = await db.scores.listAll();
-        const scores = (["EN", "ZH", "ES"] as const).map((lang) => {
-          const langScores = allScores.filter((s) => s.language === lang);
-          const latest = langScores.sort(
-            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-          )[0];
-          return { lang, latest };
-        });
+        const scores = activeLanguages
+          .filter((l) => l !== "JP")
+          .map((lang: Language) => {
+            const langScores = allScores.filter((s) => s.language === lang);
+            const latest = langScores.sort(
+              (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+            )[0];
+            return { lang, latest };
+          });
         setLatestScores(scores);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);

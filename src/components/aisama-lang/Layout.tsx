@@ -1,6 +1,5 @@
 "use client";
 
-import { Language } from "@/types/aisama-lang";
 import { clsx, type ClassValue } from "clsx";
 import {
   Bolt,
@@ -19,6 +18,7 @@ import React from "react";
 import { twMerge } from "tailwind-merge";
 import { useAuth } from "./AuthContext";
 import { useLanguage } from "./LanguageContext";
+import { LanguageSettingsModal } from "./LanguageSettingsModal";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -30,9 +30,11 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
-  const { selectedLang, setSelectedLang } = useLanguage();
+  const { selectedLang, setSelectedLang, activeLanguages } = useLanguage();
+  const [isShowingLanguageSettings, setIsShowingLanguageSettings] =
+    React.useState(false);
 
-  const languages: Language[] = ["JP", "EN", "ZH", "ES"];
+  const languages = activeLanguages;
 
   const isActive = (path: string) => {
     if (path === "/aisama-lang" && pathname === "/aisama-lang") return true;
@@ -134,11 +136,23 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
                     {lang}
                   </button>
                 ))}
+                <button
+                  onClick={() => setIsShowingLanguageSettings(true)}
+                  className="py-2 rounded-xl text-[10px] font-black bg-slate-700 text-slate-500 hover:bg-slate-600 hover:text-white transition-all border-2 border-dashed border-slate-600 flex items-center justify-center gap-1"
+                >
+                  <Bolt className="w-3 h-3" />+
+                </button>
               </div>
             </div>
           </div>
         </nav>
       </aside>
+
+      {isShowingLanguageSettings && (
+        <LanguageSettingsModal
+          onClose={() => setIsShowingLanguageSettings(false)}
+        />
+      )}
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative">

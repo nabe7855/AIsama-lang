@@ -50,8 +50,11 @@ const typeColor: Record<ItemType, string> = {
 
 export const ItemsPage = () => {
   const router = useRouter();
-  const { selectedLang: globalLang, setSelectedLang: setGlobalLang } =
-    useLanguage();
+  const {
+    selectedLang: globalLang,
+    setSelectedLang: setGlobalLang,
+    activeLanguages,
+  } = useLanguage();
   // Use global lang if it's not JP, otherwise default to EN
   const selectedLang: Exclude<Language, "JP"> =
     globalLang === "JP" ? "EN" : globalLang;
@@ -278,20 +281,22 @@ export const ItemsPage = () => {
       {/* Filters & Search */}
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex bg-white p-2 rounded-2xl sm:rounded-[2rem] border-2 border-slate-100 shadow-sm w-full lg:w-fit overflow-x-auto whitespace-nowrap scrollbar-hide">
-          {(["EN", "ZH", "ES"] as const).map((l) => (
-            <button
-              key={l}
-              onClick={() => setSelectedLang(l)}
-              className={cn(
-                "flex-1 md:flex-none px-8 sm:px-12 py-3 sm:py-3.5 text-[10px] sm:text-xs font-black rounded-xl sm:rounded-2xl transition-all duration-300",
-                selectedLang === l
-                  ? "bg-slate-900 text-white shadow-xl rotate-0"
-                  : "text-slate-400 hover:text-slate-600 hover:bg-slate-50",
-              )}
-            >
-              {l}
-            </button>
-          ))}
+          {activeLanguages
+            .filter((l) => l !== "JP")
+            .map((l: Language) => (
+              <button
+                key={l}
+                onClick={() => setSelectedLang(l)}
+                className={cn(
+                  "flex-1 md:flex-none px-8 sm:px-12 py-3 sm:py-3.5 text-[10px] sm:text-xs font-black rounded-xl sm:rounded-2xl transition-all duration-300",
+                  selectedLang === l
+                    ? "bg-slate-900 text-white shadow-xl rotate-0"
+                    : "text-slate-400 hover:text-slate-600 hover:bg-slate-50",
+                )}
+              >
+                {l}
+              </button>
+            ))}
         </div>
 
         <div className="flex bg-white p-2 rounded-2xl sm:rounded-[2rem] border-2 border-slate-100 shadow-sm w-full lg:w-auto shrink-0">
