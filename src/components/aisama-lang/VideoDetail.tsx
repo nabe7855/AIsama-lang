@@ -326,6 +326,23 @@ export const VideoDetail = () => {
       setIsImportingScore(false);
       setIsAddingScore(false);
       setScoreJsonInput("");
+
+      // Automatically increment error counts for struggled items
+      if (parsed.struggled_items && Array.isArray(parsed.struggled_items)) {
+        for (const head of parsed.struggled_items) {
+          const item = learningItems.find(
+            (i) =>
+              i.language === activeTab &&
+              i.head.trim().toLowerCase() === head.trim().toLowerCase(),
+          );
+          if (item) {
+            await db.learningItems.incrementErrorCount(item.id);
+          }
+        }
+        // Refresh learning items after potential updates
+        const iList = await db.learningItems.list(video.video_id);
+        setLearningItems(iList);
+      }
     } catch (e: any) {
       setParseError(e.message);
     }
@@ -712,7 +729,22 @@ export const VideoDetail = () => {
                                       handleReportStumble(item.id);
                                     }}
                                     title="苦手として報告（復習優先度が上がります）"
-                                    className="w-7 h-7 rounded-lg flex items-center justify-center transition-all bg-red-50 text-red-200 hover:bg-red-100 hover:text-red-500"
+                                    className={cn(
+                                      "w-7 h-7 rounded-lg flex items-center justify-center transition-all",
+                                      (item.error_count || 0) > 0
+                                        ? "bg-red-500 text-white shadow-lg shadow-red-200"
+                                        : "bg-red-50 text-red-200 hover:bg-red-100 hover:text-red-500",
+                                    )}
+                                    style={{
+                                      opacity:
+                                        (item.error_count || 0) > 0
+                                          ? Math.min(
+                                              1,
+                                              0.4 +
+                                                (item.error_count || 0) * 0.15,
+                                            )
+                                          : 1,
+                                    }}
                                   >
                                     <TriangleAlert className="w-3.5 h-3.5" />
                                   </button>
@@ -1062,7 +1094,8 @@ Output ONLY JSON. Do not include markdown code blocks.
   "clarity": 0-100,
   "main_problem": "(Detailed English explanation of the biggest issue and why it matters)",
   "improvement_tip": "(Detailed and actionable English advice on how to improve)",
-  "comment": "(Detailed English feedback on overall performance, including specific strengths and weaknesses)"
+  "comment": "(Detailed English feedback on overall performance, including specific strengths and weaknesses)",
+  "struggled_items": ["(Put the EXACT words/phrases from the script that I struggled with here as an array)"]
 }
 
 【Script】
@@ -1089,7 +1122,8 @@ Output ONLY JSON. Do not include markdown code blocks.
   "clarity": 0-100,
   "main_problem": "(Detailed English explanation of the biggest issue and why it matters)",
   "improvement_tip": "(Detailed and actionable English advice on how to improve)",
-  "comment": "(Detailed English feedback on overall performance, including specific strengths and weaknesses)"
+  "comment": "(Detailed English feedback on overall performance, including specific strengths and weaknesses)",
+  "struggled_items": ["(Put the EXACT words/phrases from the script that I struggled with here as an array)"]
 }
 
 【Script】
